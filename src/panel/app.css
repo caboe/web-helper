@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@source "../**/*.{svelte,ts,html}";
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #020617;
+  color: #e2e8f0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Mindestbreite: Popup-Fallback sieht damit gut aus, Side Panel ist ohnehin breiter */
+  min-width: 360px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": [
+      "chrome",
+      "node",
+      "vite/client"
+    ],
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "include": [
+    "src",
+    "panel.html",
+    "vite.config.ts",
+    "svelte.config.js",
+    "scripts"
+  ]
+}
