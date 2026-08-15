@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 440px; height: 280px; overflow: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .tile { width: 440px; height: 280px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #a855f7 100%); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 36px; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .45; }
+  .g1 { width: 300px; height: 300px; background: #c084fc; top: -90px; right: -60px; }
+  .g2 { width: 220px; height: 220px; background: #6366f1; bottom: -80px; left: -60px; }
+  .logo { position: absolute; top: 22px; left: 26px; display: flex; align-items: center; gap: 9px; }
+  .logo .ic { width: 30px; height: 30px; border-radius: 9px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35); display: grid; place-items: center; font-size: 16px; color: #fff; backdrop-filter: blur(4px); }
+  .logo b { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  h1 { color: #fff; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+  h1 span { color: #dbe4ff; }
+  p { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 12px; line-height: 1.5; max-width: 330px; }
+  .chips { position: absolute; bottom: 22px; left: 26px; display: flex; gap: 8px; }
+  .chips span { font-size: 10.5px; font-weight: 600; color: #fff; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 5px 11px; }
+</style>
+</head>
+<body>
+  <div class="tile">
+    <div class="glow g1"></div><div class="glow g2"></div>
+    <div class="logo"><div class="ic">⚡</div><b>Web Helper AI</b></div>
+    <h1>Deine KI arbeitet <span>direkt auf der Seite</span></h1>
+    <p>Seiteninhalte an eigene LLM-Endpunkte senden – mit Systemprompts und Tool-Calling: Formulare füllen, Texte ersetzen, Elemente klicken.</p>
+    <div class="chips"><span>OpenAI</span><span>Anthropic</span><span>OpenRouter</span><span>DeepSeek</span><span>Ollama</span></div>
+  </div>
+</body>
+</html>
