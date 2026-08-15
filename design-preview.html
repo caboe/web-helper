@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Web Helper AI – Design-Vorschläge</title>
+<style>
+  :root { --ink: #18181b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: #e7e5e4; color: var(--ink); padding: 40px 24px 80px;
+  }
+  h1 { font-size: 22px; letter-spacing: -0.02em; }
+  .intro { max-width: 1100px; margin: 0 auto 8px; }
+  .intro p { color: #57534e; font-size: 13px; margin-top: 6px; line-height: 1.5; }
+  .grid { max-width: 1100px; margin: 28px auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 26px; }
+
+  .col { display: flex; flex-direction: column; gap: 10px; }
+  .caption { font-size: 13px; line-height: 1.5; }
+  .caption strong { display: block; font-size: 15px; letter-spacing: -0.01em; margin-bottom: 3px; }
+  .caption span { color: #57534e; }
+
+  /* Panel-Frame */
+  .frame { border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06); }
+  .panel { width: 100%; min-height: 560px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* ---------- SHARED MOCKUP CONTENT ---------- */
+  .ph { display: flex; align-items: center; gap: 8px; }
+  .ph .logo { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; }
+  .ph h2 { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .tabs { display: flex; gap: 4px; }
+  .tabs button { border: 0; font-size: 11px; font-weight: 500; padding: 5px 9px; border-radius: 8px; cursor: default; }
+  .lbl { font-size: 10.5px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.6; }
+  .seg { display: flex; padding: 2px; border-radius: 999px; }
+  .seg button { flex: 1; border: 0; font-size: 11px; font-weight: 500; padding: 5px 0; border-radius: 999px; cursor: default; }
+  .prev { border-radius: 12px; padding: 10px; }
+  .prev .t { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+  .prev .b { font-size: 10.5px; line-height: 1.45; opacity: 0.75; }
+  .prev .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 9.5px; opacity: 0.55; }
+  .sel { border-radius: 10px; padding: 8px 10px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+  .sel b { font-weight: 600; }
+  .sel small { opacity: 0.6; font-size: 9.5px; }
+  .btn { border: 0; border-radius: 10px; padding: 9px 0; font-size: 12px; font-weight: 600; cursor: default; text-align: center; }
+  .toolchip { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 6px 9px; border-radius: 999px; }
+  .toolchip i { font-style: normal; font-family: ui-monospace, Menlo, monospace; }
+  .res { border-radius: 12px; padding: 10px; }
+  .res .rh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .res .rh b { font-size: 10.5px; }
+  .res .rh button { font-size: 9.5px; border-radius: 6px; padding: 3px 7px; border: 0; cursor: default; }
+  .res p { font-size: 10.5px; line-height: 1.5; opacity: 0.85; }
+  .row { display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px 10px; }
+  .row .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .row .nm { font-size: 11px; font-weight: 600; flex: 1; min-width: 0; }
+  .row .url { font-size: 9.5px; opacity: 0.55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .acts { display: flex; gap: 4px; }
+  .row .acts i { font-style: normal; font-size: 9.5px; border-radius: 6px; padding: 3px 6px; opacity: 0.85; }
+  .badge { font-size: 8.5px; font-weight: 700; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 5px; text-transform: uppercase; }
+  .spacer { flex: 1; }
+
+  /* ============ DESIGN 1: LIGHT AIR ============ */
+  .d1 .panel { background: #fafaf9; }
+  .d1 .ph .logo { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 4px 10px rgba(99,102,241,0.35); }
+  .d1 .ph h2 { color: #18181b; }
+  .d1 .tabs button { background: transparent; color: #71717a; }
+  .d1 .tabs button.on { background: #18181b; color: #fafaf9; }
+  .d1 .lbl { color: #52525b; }
+  .d1 .seg { background: #e4e4e7; }
+  .d1 .seg button { background: transparent; color: #52525b; }
+  .d1 .seg button.on { background: #fff; color: #18181b; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .d1 .prev { background: #fff; border: 1px solid #f0f0f1; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .d1 .prev .t { color: #18181b; }
+  .d1 .prev .b { color: #52525b; }
+  .d1 .sel { background: #fff; border: 1px solid #e4e4e7; color: #18181b; }
+  .d1 .btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 6px 16px rgba(99,102,241,0.35); }
+  .d1 .toolchip { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .d1 .res { background: #fff; border: 1px solid #f0f0f1; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .d1 .res .rh b { color: #18181b; }
+  .d1 .res .rh button { background: #f4f4f5; color: #52525b; }
+  .d1 .res p { color: #3f3f46; }
+  .d1 .row { background: #fff; border: 1px solid #f0f0f1; }
+  .d1 .row .nm { color: #18181b; }
+  .d1 .row .dot { background: #22c55e; }
+  .d1 .row .acts i { background: #f4f4f5; color: #52525b; }
+  .d1 .badge { background: #eef2ff; color: #4f46e5; }
+
+  /* ============ DESIGN 2: DEEP MODERN ============ */
+  .d2 .frame { background: #0b0e17; }
+  .d2 .panel { background: radial-gradient(120% 90% at 20% 0%, #141b2e 0%, #0b0e17 55%); }
+  .d2 .ph .logo { background: linear-gradient(135deg, #a78bfa, #6d28d9); color: #fff; box-shadow: 0 0 14px rgba(139,92,246,0.55); }
+  .d2 .ph h2 { color: #eef2ff; }
+  .d2 .tabs button { background: transparent; color: #94a3b8; }
+  .d2 .tabs button.on { background: rgba(139,92,246,0.16); color: #c4b5fd; box-shadow: inset 0 0 0 1px rgba(139,92,246,0.35); }
+  .d2 .lbl { color: #64748b; }
+  .d2 .seg { background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06); }
+  .d2 .seg button { background: transparent; color: #94a3b8; }
+  .d2 .seg button.on { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; box-shadow: 0 4px 12px rgba(139,92,246,0.45); }
+  .d2 .prev { background: rgba(255,255,255,0.045); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07); backdrop-filter: blur(8px); }
+  .d2 .prev .t { color: #f1f5f9; }
+  .d2 .prev .b { color: #a1aab8; }
+  .d2 .prev .meta { color: #64748b; }
+  .d2 .sel { background: rgba(255,255,255,0.045); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color: #f1f5f9; }
+  .d2 .btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 8px 20px rgba(109,40,217,0.45); }
+  .d2 .toolchip { background: rgba(16,185,129,0.12); color: #6ee7b7; box-shadow: inset 0 0 0 1px rgba(16,185,129,0.3); }
+  .d2 .res { background: rgba(255,255,255,0.045); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07); }
+  .d2 .res .rh b { color: #f1f5f9; }
+  .d2 .res .rh button { background: rgba(255,255,255,0.08); color: #cbd5e1; }
+  .d2 .res p { color: #cbd5e1; }
+  .d2 .row { background: rgba(255,255,255,0.035); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06); }
+  .d2 .row .nm { color: #f1f5f9; }
+  .d2 .row .url { color: #64748b; }
+  .d2 .row .dot { background: #34d399; box-shadow: 0 0 8px rgba(52,211,153,0.7); }
+  .d2 .row .acts i { background: rgba(255,255,255,0.07); color: #94a3b8; }
+  .d2 .badge { background: rgba(139,92,246,0.18); color: #c4b5fd; }
+
+  /* ============ DESIGN 3: WARM & BOLD ============ */
+  .d3 .panel { background: #faf6ef; }
+  .d3 .ph .logo { background: #ff6b35; color: #fff; border-radius: 7px; }
+  .d3 .ph h2 { color: #26221c; font-family: Georgia, "Times New Roman", serif; font-size: 15px; letter-spacing: 0.01em; }
+  .d3 .tabs button { background: transparent; color: #7d7263; font-family: Georgia, serif; }
+  .d3 .tabs button.on { background: #26221c; color: #faf6ef; }
+  .d3 .lbl { color: #8a7d6b; }
+  .d3 .seg { background: #e9e0d2; border-radius: 10px; }
+  .d3 .seg button { background: transparent; color: #7d7263; border-radius: 8px; }
+  .d3 .seg button.on { background: #fff; color: #26221c; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+  .d3 .prev { background: #fff; border: 1px solid #e4d9c7; border-left: 3px solid #ff6b35; }
+  .d3 .prev .t { color: #26221c; }
+  .d3 .prev .b { color: #6b6153; }
+  .d3 .sel { background: #fff; border: 1px solid #e4d9c7; color: #26221c; }
+  .d3 .btn { background: #ff6b35; color: #fff; border-radius: 8px; box-shadow: 0 6px 14px rgba(255,107,53,0.35); }
+  .d3 .toolchip { background: #eaf5ee; color: #1d7a45; border: 1px solid #cde9d5; }
+  .d3 .res { background: #fff; border: 1px solid #e4d9c7; }
+  .d3 .res .rh b { color: #26221c; }
+  .d3 .res .rh button { background: #f2ece1; color: #6b6153; }
+  .d3 .res p { color: #4c453b; }
+  .d3 .row { background: #fff; border: 1px solid #e4d9c7; }
+  .d3 .row .nm { color: #26221c; }
+  .d3 .row .dot { background: #2fa46b; }
+  .d3 .row .acts i { background: #f2ece1; color: #7d7263; }
+  .d3 .badge { background: #fde8dd; color: #d14512; }
+</style>
+</head>
+<body>
+  <div class="intro">
+    <h1>Web Helper AI — Design-Vorschläge</h1>
+    <p>Drei Richtungen, gleiche Funktionalität. Jede Spalte ist ein fertiger Look fürs Side Panel.
+    Datei einfach im Browser öffnen (Doppelklick). Danach sage mir, welche Richtung (oder welche Mischung) du willst — ich setze sie im Svelte-Code um.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ============ 1: LIGHT AIR ============ -->
+    <div class="col">
+      <div class="caption"><strong>1 · Light Air</strong><span>Hell, luftig, minimalistisch — Soft-Shadows statt Boxen, klare Typo, ein Akzent.</span></div>
+      <div class="frame"><div class="panel d1">
+        <div class="ph">
+          <div class="logo">⚡</div><h2>Web Helper</h2>
+          <div class="spacer"></div>
+          <div class="tabs"><button class="on">Senden</button><button>Endpunkte</button><button>Prompts</button></div>
+        </div>
+        <div class="lbl">Inhalt senden</div>
+        <div class="seg"><button class="on">Auswahl</button><button>Ganze Seite</button></div>
+        <div class="prev">
+          <div class="t">Kontaktformular — Beispiel.de</div>
+          <div class="b">Name, E-Mail und Nachricht sind aktuell leer. Das Formular hat drei Felder und einen Absende-Button…</div>
+          <div class="meta"><span>1.240 Zeichen</span><span>Aktualisieren</span></div>
+        </div>
+        <div class="lbl">LLM-Endpunkt</div>
+        <div class="sel"><b>OpenRouter</b><small>openai/gpt-4o-mini</small></div>
+        <div class="lbl">Systemprompt</div>
+        <div class="sel"><b>Formular-Assistent</b><small>füllt Felder aus</small></div>
+        <div class="btn">An LLM senden</div>
+        <div class="toolchip">✓ <i>fill_element</i> → #email</div>
+        <div class="res">
+          <div class="rh"><b>Antwort</b><div><button>Kopieren</button> <button>In Seite einfügen</button></div></div>
+          <p>Ich habe das Formular ausgefüllt: Name, E-Mail und Nachricht wurden übernommen. Klicke zum Absenden auf den Button…</p>
+        </div>
+        <div class="row"><span class="dot"></span><div><div class="nm">OpenRouter</div><div class="url">openrouter.ai/api/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+        <div class="row"><span class="dot" style="background:#f59e0b"></span><div><div class="nm">DeepSeek</div><div class="url">api.deepseek.com/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+      </div></div>
+    </div>
+
+    <!-- ============ 2: DEEP MODERN ============ -->
+    <div class="col">
+      <div class="caption"><strong>2 · Deep Modern</strong><span>Dunkel, aber weich: Glas-Karten, sanfter Verlauf, violetter Glow, klare Hierarchie.</span></div>
+      <div class="frame"><div class="panel d2">
+        <div class="ph">
+          <div class="logo">✦</div><h2>Web Helper</h2>
+          <div class="spacer"></div>
+          <div class="tabs"><button class="on">Senden</button><button>Endpunkte</button><button>Prompts</button></div>
+        </div>
+        <div class="lbl">Inhalt senden</div>
+        <div class="seg"><button class="on">Auswahl</button><button>Ganze Seite</button></div>
+        <div class="prev">
+          <div class="t">Kontaktformular — Beispiel.de</div>
+          <div class="b">Name, E-Mail und Nachricht sind aktuell leer. Das Formular hat drei Felder und einen Absende-Button…</div>
+          <div class="meta"><span>1.240 Zeichen</span><span>Aktualisieren</span></div>
+        </div>
+        <div class="lbl">LLM-Endpunkt</div>
+        <div class="sel"><b>OpenRouter</b><small>openai/gpt-4o-mini</small></div>
+        <div class="lbl">Systemprompt</div>
+        <div class="sel"><b>Formular-Assistent</b><small>füllt Felder aus</small></div>
+        <div class="btn">An LLM senden</div>
+        <div class="toolchip">✓ <i>fill_element</i> → #email</div>
+        <div class="res">
+          <div class="rh"><b>Antwort</b><div><button>Kopieren</button> <button>In Seite einfügen</button></div></div>
+          <p>Ich habe das Formular ausgefüllt: Name, E-Mail und Nachricht wurden übernommen. Klicke zum Absenden auf den Button…</p>
+        </div>
+        <div class="row"><span class="dot"></span><div><div class="nm">OpenRouter</div><div class="url">openrouter.ai/api/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+        <div class="row"><span class="dot" style="background:#f59e0b"></span><div><div class="nm">DeepSeek</div><div class="url">api.deepseek.com/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+      </div></div>
+    </div>
+
+    <!-- ============ 3: WARM & BOLD ============ -->
+    <div class="col">
+      <div class="caption"><strong>3 · Warm &amp; Bold</strong><span>Charaktervoll: warmes Papier, Serifen-Titel, kräftiger Terrakotta-Akzent — hebt sich ab.</span></div>
+      <div class="frame"><div class="panel d3">
+        <div class="ph">
+          <div class="logo">⚡</div><h2>Web Helper</h2>
+          <div class="spacer"></div>
+          <div class="tabs"><button class="on">Senden</button><button>Endpunkte</button><button>Prompts</button></div>
+        </div>
+        <div class="lbl">Inhalt senden</div>
+        <div class="seg"><button class="on">Auswahl</button><button>Ganze Seite</button></div>
+        <div class="prev">
+          <div class="t">Kontaktformular — Beispiel.de</div>
+          <div class="b">Name, E-Mail und Nachricht sind aktuell leer. Das Formular hat drei Felder und einen Absende-Button…</div>
+          <div class="meta"><span>1.240 Zeichen</span><span>Aktualisieren</span></div>
+        </div>
+        <div class="lbl">LLM-Endpunkt</div>
+        <div class="sel"><b>OpenRouter</b><small>openai/gpt-4o-mini</small></div>
+        <div class="lbl">Systemprompt</div>
+        <div class="sel"><b>Formular-Assistent</b><small>füllt Felder aus</small></div>
+        <div class="btn">An LLM senden</div>
+        <div class="toolchip">✓ <i>fill_element</i> → #email</div>
+        <div class="res">
+          <div class="rh"><b>Antwort</b><div><button>Kopieren</button> <button>In Seite einfügen</button></div></div>
+          <p>Ich habe das Formular ausgefüllt: Name, E-Mail und Nachricht wurden übernommen. Klicke zum Absenden auf den Button…</p>
+        </div>
+        <div class="row"><span class="dot"></span><div><div class="nm">OpenRouter</div><div class="url">openrouter.ai/api/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+        <div class="row"><span class="dot" style="background:#f59e0b"></span><div><div class="nm">DeepSeek</div><div class="url">api.deepseek.com/v1/…</div></div><div class="acts"><i>Bearbeiten</i><i>Kopieren</i><i>Löschen</i></div></div>
+      </div></div>
+    </div>
+
+  </div>
+</body>
+</html>

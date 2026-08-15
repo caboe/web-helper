@@ -35,25 +35,26 @@
   ]
 </script>
 
-<div class="flex h-full flex-col bg-slate-950 text-slate-200">
+<div class="flex h-full flex-col bg-[#fafaf9] text-zinc-900">
   <!-- Header -->
-  <header class="flex items-center gap-2 border-b border-slate-800 bg-slate-900/60 px-3 py-2.5">
+  <header class="flex items-center gap-2.5 border-b border-zinc-200/70 bg-white/80 px-4 py-3 backdrop-blur">
     <img
       src={chrome.runtime.getURL('icons/icon32.png')}
       alt=""
       width="24"
       height="24"
-      class="h-6 w-6 rounded-md"
+      class="h-6 w-6 rounded-lg shadow-[0_2px_8px_rgba(99,102,241,0.35)]"
     />
-    <h1 class="text-sm font-semibold tracking-tight text-slate-100">Web Helper AI</h1>
-    <div class="ml-auto flex gap-1">
+    <h1 class="text-sm font-semibold tracking-tight">Web Helper AI</h1>
+    <div class="ml-auto flex items-center gap-0.5">
       {#each tabs as t}
         <button
           type="button"
           onclick={() => (activeTab = t.id)}
-          class:bg-indigo-600={activeTab === t.id}
-          class:bg-slate-800={activeTab !== t.id}
-          class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+          class:bg-zinc-900={activeTab === t.id}
+          class:text-white={activeTab === t.id}
+          class:text-zinc-500={activeTab !== t.id}
+          class="rounded-full px-3 py-1 text-xs font-medium transition hover:text-zinc-800"
         >
           {t.label}
         </button>
@@ -72,7 +73,7 @@
     {/if}
   </main>
 
-  <footer class="border-t border-slate-800 bg-slate-900/60 px-3 py-1.5 text-[10px] text-slate-500">
+  <footer class="border-t border-zinc-200/70 bg-white/60 px-4 py-2 text-[10px] text-zinc-400">
     Auswahl markieren &amp; mit Systemprompt + Endpunkt senden · Tools: Füllen, Klicken, Text, Lesen
   </footer>
 </div>

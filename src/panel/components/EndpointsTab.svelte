@@ -21,6 +21,13 @@
   let templateId = $state('')
   let appliedHint = $state('')
 
+  // Light-Air-Design-Tokens
+  const card = 'rounded-2xl bg-white shadow-[0_1px_2px_rgba(24,24,27,0.04),0_6px_16px_rgba(24,24,27,0.06)]'
+  const input = 'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/15'
+  const ghost = 'rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[10px] font-medium text-zinc-600 transition hover:bg-zinc-50'
+  const primary =
+    'rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] transition hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(99,102,241,0.4)]'
+
   function resetForm() {
     editingId = null
     title = ''
@@ -129,26 +136,28 @@
   }
 </script>
 
-<div class="flex flex-col gap-3 p-3">
+<div class="flex flex-col gap-4 p-4">
   <!-- Formular -->
   <form
     onsubmit={(e) => {
       e.preventDefault()
       submit()
     }}
-    class="rounded-lg border border-slate-800 bg-slate-900/60 p-3"
+    class={card + ' p-4'}
   >
-    <div class="mb-2 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-slate-200">{editingId ? 'Endpunkt bearbeiten' : 'Neuer Endpunkt'}</h2>
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? 'Endpunkt bearbeiten' : 'Neuer Endpunkt'}</h2>
       {#if editingId}
-        <button type="button" onclick={resetForm} class="text-[11px] text-slate-400 hover:text-slate-200">Abbrechen</button>
+        <button type="button" onclick={resetForm} class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700">
+          Abbrechen
+        </button>
       {/if}
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2.5">
       <select
         bind:value={templateId}
         onchange={applyTemplate}
-        class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+        class={input}
       >
         <option value="">Vorlage wählen (füllt Felder vor) …</option>
         {#each ENDPOINT_TEMPLATES as t}
@@ -156,89 +165,106 @@
         {/each}
       </select>
       {#if appliedHint}
-        <p class="text-[11px] text-slate-500">{appliedHint}</p>
+        <p class="text-[11px] text-zinc-500">{appliedHint}</p>
       {/if}
-      <input bind:value={title} type="text" placeholder="Titel, z. B. „OpenAI“" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500" />
-      <input bind:value={url} type="text" placeholder="Endpunkt-URL, z. B. https://api.openai.com/v1/chat/completions" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+      <input bind:value={title} type="text" placeholder="Titel, z. B. „OpenAI“" class={input} />
+      <input bind:value={url} type="text" placeholder="Endpunkt-URL, z. B. https://api.openai.com/v1/chat/completions" class={input} />
       <div class="relative">
         <input
           bind:value={apiKey}
           type={showKey ? 'text' : 'password'}
           placeholder={editingId ? 'API-Key (leer lassen = beibehalten)' : 'API-Key (optional, z. B. bei Ollama leer)'}
-          class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 pr-14 text-sm outline-none focus:border-indigo-500"
+          class={input + ' pr-16'}
         />
         <button
           type="button"
           onclick={() => (showKey = !showKey)}
-          class="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800"
+          class="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 hover:bg-zinc-50"
         >
           {showKey ? 'Ausblenden' : 'Zeigen'}
         </button>
       </div>
-      <div class="grid grid-cols-2 gap-2">
-        <input bind:value={model} type="text" placeholder="Modell (optional)" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500" />
-        <select bind:value={format} class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500">
+      <div class="grid grid-cols-2 gap-2.5">
+        <input bind:value={model} type="text" placeholder="Modell (optional)" class={input} />
+        <select bind:value={format} class={input}>
           <option value="auto">Format: Auto</option>
           <option value="openai">OpenAI-kompatibel</option>
           <option value="anthropic">Anthropic</option>
         </select>
       </div>
-      <p class="text-[10px] leading-relaxed text-slate-500">
+      <p class="text-[10px] leading-relaxed text-zinc-400">
         Auto erkennt Anthropic an der URL, sonst OpenAI-kompatibel (Chat Completions). Ohne Modell gilt ein Standardmodell.
       </p>
       {#if formError}
-        <p class="text-xs text-rose-300">{formError}</p>
+        <p class="text-xs font-medium text-rose-600">{formError}</p>
       {/if}
-      <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+      <button type="submit" class={primary}>
         {editingId ? 'Speichern' : 'Hinzufügen'}
       </button>
     </div>
   </form>
 
   <!-- Liste -->
-  <div class="flex flex-col gap-2">
-    <h2 class="text-sm font-semibold text-slate-300">Übersicht ({endpoints.length})</h2>
+  <div class="flex flex-col gap-2.5">
+    <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
+      Übersicht
+      <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{endpoints.length}</span>
+    </h2>
     {#if endpoints.length === 0}
-      <p class="text-xs text-slate-500">Noch keine Endpunkte angelegt.</p>
+      <p class="text-xs text-zinc-400">Noch keine Endpunkte angelegt.</p>
     {/if}
     {#each endpoints as ep}
-      <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="truncate text-sm font-medium text-slate-100">{ep.title}</span>
-              <span class="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-slate-400">{formatLabel(ep.format)}</span>
-            </div>
-            <p class="mt-0.5 truncate text-[11px] text-slate-500">{ep.url}</p>
-            {#if ep.model}
-              <p class="text-[11px] text-slate-500">Modell: {ep.model}</p>
-            {/if}
-            <p class="truncate font-mono text-[10px] text-slate-600">
-              {ep.apiKey ? 'Key: ' + ep.apiKey.slice(0, 6) + '••••••••' : 'ohne Key'}
-            </p>
+      <div class="flex items-start gap-3 {card} p-3.5">
+        <span
+          class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+          class:bg-indigo-500={ep.format === 'openai'}
+          class:bg-orange-500={ep.format === 'anthropic'}
+          class:bg-zinc-300={ep.format === 'auto'}
+        ></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="truncate text-sm font-medium text-zinc-900">{ep.title}</span>
+            <span class="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500">
+              {formatLabel(ep.format)}
+            </span>
           </div>
-          <div class="flex shrink-0 flex-col items-end gap-1">
-            <div class="flex gap-1">
-              <button type="button" onclick={() => startEdit(ep)} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">Bearbeiten</button>
-              <button type="button" onclick={() => copy(ep)} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">
-                {copiedId === ep.id ? 'Kopiert ✓' : 'Kopieren'}
-              </button>
-              <button type="button" onclick={() => remove(ep)} class="rounded border border-rose-800 px-2 py-0.5 text-[10px] text-rose-300 hover:bg-rose-950">Löschen</button>
-            </div>
+          <p class="mt-0.5 truncate text-[11px] text-zinc-500">{ep.url}</p>
+          <p class="text-[11px] text-zinc-400">Modell: {ep.model || 'Standard'}</p>
+          <p class="truncate font-mono text-[10px] text-zinc-400">
+            {ep.apiKey ? 'Key: ' + ep.apiKey.slice(0, 6) + '••••••••' : 'ohne Key'}
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-col items-end gap-1.5">
+          <div class="flex gap-1">
+            <button type="button" onclick={() => startEdit(ep)} class={ghost}>Bearbeiten</button>
+            <button type="button" onclick={() => copy(ep)} class={ghost}>
+              {copiedId === ep.id ? 'Kopiert ✓' : 'Kopieren'}
+            </button>
             <button
               type="button"
-              onclick={() => test(ep)}
-              disabled={testingId === ep.id}
-              class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+              onclick={() => remove(ep)}
+              class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
             >
-              {testingId === ep.id ? 'Testet …' : 'Verbindung testen'}
+              Löschen
             </button>
-            {#if testOutcome && testOutcome.id === ep.id}
-              <p class:emerald-300={testOutcome.ok} class:rose-300={!testOutcome.ok} class="text-[10px]">
-                {testOutcome.ok ? '✓ ' + testOutcome.detail : '✗ ' + testOutcome.detail}
-              </p>
-            {/if}
           </div>
+          <button
+            type="button"
+            onclick={() => test(ep)}
+            disabled={testingId === ep.id}
+            class={ghost + ' disabled:opacity-50'}
+          >
+            {testingId === ep.id ? 'Testet …' : 'Verbindung testen'}
+          </button>
+          {#if testOutcome && testOutcome.id === ep.id}
+            <p
+              class="text-[10px] font-medium"
+              class:text-emerald-600={testOutcome.ok}
+              class:text-rose-600={!testOutcome.ok}
+            >
+              {testOutcome.ok ? '✓ ' + testOutcome.detail : '✗ ' + testOutcome.detail}
+            </p>
+          {/if}
         </div>
       </div>
     {/each}

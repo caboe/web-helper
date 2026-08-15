@@ -30,6 +30,14 @@
   const endpoint = $derived(endpoints.find((e) => e.id === endpointId) ?? null)
   const prompt = $derived(prompts.find((p) => p.id === promptId) ?? null)
 
+  // Light-Air-Design-Tokens
+  const card = 'rounded-2xl bg-white shadow-[0_1px_2px_rgba(24,24,27,0.04),0_6px_16px_rgba(24,24,27,0.06)]'
+  const label = 'mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-zinc-500'
+  const input = 'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/15'
+  const ghost = 'rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-600 transition hover:bg-zinc-50'
+  const primary =
+    'rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] transition hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(99,102,241,0.4)]'
+
   onMount(() => {
     loadSettings().then((s) => {
       if (s.mode) mode = s.mode
@@ -173,38 +181,44 @@
   }
 </script>
 
-<div class="flex flex-col gap-3 p-3">
+<div class="flex flex-col gap-4 p-4">
   <!-- Warnung: keine Endpunkte -->
   {#if endpoints.length === 0}
-    <div class="rounded-lg border border-amber-700/60 bg-amber-950/40 p-3 text-xs text-amber-200">
-      Noch kein LLM-Endpunkt angelegt. Wechsle zum Tab <strong>Endpunkte</strong> und füge einen hinzu
-      (z. B. OpenAI, OpenRouter, Ollama oder Anthropic).
+    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-xs leading-relaxed text-amber-800">
+      Noch kein LLM-Endpunkt angelegt. Wechsle zum Tab <strong class="font-semibold">Endpunkte</strong> und füge
+      einen hinzu (z. B. OpenAI, OpenRouter, Ollama oder Anthropic).
     </div>
   {/if}
 
   <!-- Modus-Auswahl -->
   <div>
-    <div class="mb-1.5 text-xs font-medium text-slate-400">Inhalt senden</div>
-    <div class="flex rounded-lg border border-slate-700 bg-slate-900 p-0.5">
+    <span class={label}>Inhalt senden</span>
+    <div class="flex rounded-full bg-zinc-200/60 p-1">
       <button
         type="button"
         onclick={() => (mode = 'selection')}
-        class:bg-indigo-600={mode === 'selection'}
-        class="flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors"
+        class:bg-white={mode === 'selection'}
+        class:shadow-sm={mode === 'selection'}
+        class:text-zinc-900={mode === 'selection'}
+        class:text-zinc-500={mode !== 'selection'}
+        class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
         Auswahl
       </button>
       <button
         type="button"
         onclick={() => (mode = 'page')}
-        class:bg-indigo-600={mode === 'page'}
-        class="flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors"
+        class:bg-white={mode === 'page'}
+        class:shadow-sm={mode === 'page'}
+        class:text-zinc-900={mode === 'page'}
+        class:text-zinc-500={mode !== 'page'}
+        class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
         Ganze Seite
       </button>
     </div>
     {#if mode === 'selection' && pageState && !pageState.hasSelection}
-      <p class="mt-1 text-[11px] text-slate-500">
+      <p class="mt-1.5 text-[11px] text-zinc-400">
         Aktuell nichts markiert – beim Senden wird die ganze Seite verwendet.
       </p>
     {/if}
@@ -212,39 +226,34 @@
 
   <!-- Seitenstatus / Vorschau -->
   {#if pageError}
-    <div class="rounded-lg border border-rose-800/60 bg-rose-950/40 p-3 text-xs text-rose-200">
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700">
       {pageError}
       {#if currentTabId}
-        <button type="button" onclick={refresh} class="ml-2 underline">Erneut versuchen</button>
+        <button type="button" onclick={refresh} class="ml-2 font-semibold underline">Erneut versuchen</button>
       {/if}
     </div>
   {:else if pageState}
-    <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-2.5">
-      <div class="mb-1 flex items-center justify-between gap-2">
-        <span class="truncate text-[11px] text-slate-400">{pageState.title}</span>
+    <div class={card + ' p-3'}>
+      <div class="mb-2 flex items-center justify-between gap-2">
+        <span class="truncate text-[11px] font-medium text-zinc-500">{pageState.title}</span>
         <div class="flex shrink-0 items-center gap-2">
-          <span class="text-[10px] text-slate-500">{contentFor.length.toLocaleString('de-DE')} Zeichen</span>
-          <button
-            type="button"
-            onclick={refresh}
-            disabled={refreshing}
-            class="rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800 disabled:opacity-50"
-          >
+          <span class="text-[10px] text-zinc-400">{contentFor.length.toLocaleString('de-DE')} Zeichen</span>
+          <button type="button" onclick={refresh} disabled={refreshing} class={ghost + ' disabled:opacity-50'}>
             {refreshing ? '…' : 'Aktualisieren'}
           </button>
         </div>
       </div>
-      <p class="max-h-28 overflow-y-auto whitespace-pre-wrap break-words rounded bg-slate-950/60 p-2 text-[11px] leading-relaxed text-slate-300">
+      <div class="max-h-28 overflow-y-auto whitespace-pre-wrap break-words rounded-xl bg-zinc-50 p-2.5 text-[11px] leading-relaxed text-zinc-600">
         {preview || '– keine Inhalte extrahiert –'}
-      </p>
+      </div>
     </div>
   {/if}
 
   <!-- Endpunkt + Prompt -->
-  <div class="grid grid-cols-1 gap-2">
+  <div class="flex flex-col gap-3">
     <label class="block">
-      <span class="mb-1 block text-xs font-medium text-slate-400">LLM-Endpunkt</span>
-      <select bind:value={endpointId} class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm">
+      <span class={label}>LLM-Endpunkt</span>
+      <select bind:value={endpointId} class={input}>
         <option value="">– Endpunkt wählen –</option>
         {#each endpoints as e}
           <option value={e.id}>{endpointLabel(e)}</option>
@@ -252,8 +261,8 @@
       </select>
     </label>
     <label class="block">
-      <span class="mb-1 block text-xs font-medium text-slate-400">Systemprompt</span>
-      <select bind:value={promptId} class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-2 text-sm">
+      <span class={label}>Systemprompt</span>
+      <select bind:value={promptId} class={input}>
         <option value="">– ohne Systemprompt –</option>
         {#each prompts as p}
           <option value={p.id}>{p.title}</option>
@@ -268,7 +277,7 @@
       type="button"
       onclick={send}
       disabled={running}
-      class="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+      class="{primary} flex-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
     >
       {running ? 'Verarbeitet …' : 'An LLM senden'}
     </button>
@@ -276,7 +285,7 @@
       <button
         type="button"
         onclick={cancel}
-        class="rounded-lg border border-slate-700 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800"
+        class="rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-600 transition hover:bg-zinc-50"
       >
         Abbrechen
       </button>
@@ -285,54 +294,61 @@
 
   <!-- Tool-Log -->
   {#if toolLog.length > 0}
-    <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-2.5">
-      <div class="mb-1.5 text-xs font-medium text-slate-400">Tool-Aufrufe auf der Seite ({toolLog.length})</div>
+    <div class={card + ' p-3'}>
+      <div class="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
+        <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+        Tool-Aufrufe auf der Seite ({toolLog.length})
+      </div>
       <ul class="flex flex-col gap-1.5">
         {#each toolLog as t}
-          <li class="rounded bg-slate-950/60 p-1.5 text-[11px] leading-snug">
-            <span class="font-mono text-indigo-300">{t.name}</span>
-            <span class="text-slate-500"> {t.args.slice(0, 80)}</span>
-            <div class="text-slate-400">{t.result.slice(0, 160)}</div>
+          <li class="rounded-xl bg-zinc-50 px-2.5 py-2 text-[11px] leading-snug">
+            <span class="font-mono font-semibold text-indigo-600">{t.name}</span>
+            <span class="text-zinc-400"> {t.args.slice(0, 80)}</span>
+            <div class="mt-0.5 text-zinc-500">{t.result.slice(0, 160)}</div>
           </li>
         {/each}
       </ul>
     </div>
   {/if}
 
-  <!-- Ergebnis -->
+  <!-- Laufend -->
   {#if status === 'running'}
-    <div class="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-xs text-slate-400">
-      <span class="h-3 w-3 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></span>
+    <div class="flex items-center gap-2.5 rounded-2xl bg-white p-3 text-xs text-zinc-500 shadow-sm">
+      <span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></span>
       Das Modell arbeitet … (Tool-Calling aktiv)
     </div>
   {/if}
 
+  <!-- Ergebnis -->
   {#if status === 'done' && resultText}
-    <div class="rounded-lg border border-emerald-800/60 bg-emerald-950/30 p-2.5">
-      <div class="mb-1 flex items-center justify-between">
-        <span class="text-xs font-medium text-emerald-300">Antwort</span>
+    <div class={card + ' p-3.5'}>
+      <div class="mb-2 flex items-center justify-between">
+        <span class="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Antwort
+        </span>
         <div class="flex gap-1.5">
-          <button type="button" onclick={copyResult} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">
+          <button type="button" onclick={copyResult} class={ghost}>
             {copied ? 'Kopiert ✓' : 'Kopieren'}
           </button>
-          <button type="button" onclick={insertResult} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">
+          <button type="button" onclick={insertResult} class={ghost}>
             In Seite einfügen
           </button>
         </div>
       </div>
-      <p class="max-h-52 overflow-y-auto whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-200">
+      <p class="max-h-52 overflow-y-auto whitespace-pre-wrap break-words text-xs leading-relaxed text-zinc-700">
         {resultText}
       </p>
     </div>
   {/if}
 
   {#if errorMsg}
-    <div class="rounded-lg border border-rose-800/60 bg-rose-950/40 p-2.5 text-xs text-rose-200">
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
       {errorMsg}
     </div>
   {/if}
 
   {#if note}
-    <p class="text-[11px] text-slate-500">{note}</p>
+    <p class="text-[11px] text-zinc-500">{note}</p>
   {/if}
 </div>

@@ -11,6 +11,13 @@
   let formError = $state('')
   let copiedId = $state<string | null>(null)
 
+  // Light-Air-Design-Tokens
+  const card = 'rounded-2xl bg-white shadow-[0_1px_2px_rgba(24,24,27,0.04),0_6px_16px_rgba(24,24,27,0.06)]'
+  const input = 'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/15'
+  const ghost = 'rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[10px] font-medium text-zinc-600 transition hover:bg-zinc-50'
+  const primary =
+    'rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] transition hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(99,102,241,0.4)]'
+
   function resetForm() {
     editingId = null
     title = ''
@@ -61,60 +68,69 @@
   }
 </script>
 
-<div class="flex flex-col gap-3 p-3">
+<div class="flex flex-col gap-4 p-4">
   <!-- Formular -->
   <form
     onsubmit={(e) => {
       e.preventDefault()
       submit()
     }}
-    class="rounded-lg border border-slate-800 bg-slate-900/60 p-3"
+    class={card + ' p-4'}
   >
-    <div class="mb-2 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-slate-200">{editingId ? 'Systemprompt bearbeiten' : 'Neuer Systemprompt'}</h2>
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? 'Systemprompt bearbeiten' : 'Neuer Systemprompt'}</h2>
       {#if editingId}
-        <button type="button" onclick={resetForm} class="text-[11px] text-slate-400 hover:text-slate-200">Abbrechen</button>
+        <button type="button" onclick={resetForm} class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700">
+          Abbrechen
+        </button>
       {/if}
     </div>
-    <div class="flex flex-col gap-2">
-      <input bind:value={title} type="text" placeholder="Titel, z. B. „Formular-Assistent“" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500" />
+    <div class="flex flex-col gap-2.5">
+      <input bind:value={title} type="text" placeholder="Titel, z. B. „Formular-Assistent“" class={input} />
       <textarea
         bind:value={text}
         rows={6}
         placeholder="Anweisungen für das Modell, z. B.: Fülle die Formularfelder der Seite mit den Daten aus dem Kontext …"
-        class="w-full resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+        class={input + ' resize-y'}
       ></textarea>
       {#if formError}
-        <p class="text-xs text-rose-300">{formError}</p>
+        <p class="text-xs font-medium text-rose-600">{formError}</p>
       {/if}
-      <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+      <button type="submit" class={primary}>
         {editingId ? 'Speichern' : 'Hinzufügen'}
       </button>
     </div>
   </form>
 
   <!-- Liste -->
-  <div class="flex flex-col gap-2">
-    <h2 class="text-sm font-semibold text-slate-300">Übersicht ({prompts.length})</h2>
+  <div class="flex flex-col gap-2.5">
+    <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
+      Übersicht
+      <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{prompts.length}</span>
+    </h2>
     {#if prompts.length === 0}
-      <p class="text-xs text-slate-500">Noch keine Systemprompts angelegt.</p>
+      <p class="text-xs text-zinc-400">Noch keine Systemprompts angelegt.</p>
     {/if}
     {#each prompts as p}
-      <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            <span class="block truncate text-sm font-medium text-slate-100">{p.title}</span>
-            <p class="mt-1 max-h-16 overflow-hidden whitespace-pre-wrap break-words text-[11px] leading-relaxed text-slate-400">
-              {p.prompt}
-            </p>
-          </div>
-          <div class="flex shrink-0 gap-1">
-            <button type="button" onclick={() => startEdit(p)} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">Bearbeiten</button>
-            <button type="button" onclick={() => copy(p)} class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-800">
-              {copiedId === p.id ? 'Kopiert ✓' : 'Kopieren'}
-            </button>
-            <button type="button" onclick={() => remove(p)} class="rounded border border-rose-800 px-2 py-0.5 text-[10px] text-rose-300 hover:bg-rose-950">Löschen</button>
-          </div>
+      <div class="flex items-start justify-between gap-3 {card} p-3.5">
+        <div class="min-w-0">
+          <span class="block truncate text-sm font-medium text-zinc-900">{p.title}</span>
+          <p class="mt-1 max-h-16 overflow-hidden whitespace-pre-wrap break-words text-[11px] leading-relaxed text-zinc-500">
+            {p.prompt}
+          </p>
+        </div>
+        <div class="flex shrink-0 gap-1">
+          <button type="button" onclick={() => startEdit(p)} class={ghost}>Bearbeiten</button>
+          <button type="button" onclick={() => copy(p)} class={ghost}>
+            {copiedId === p.id ? 'Kopiert ✓' : 'Kopieren'}
+          </button>
+          <button
+            type="button"
+            onclick={() => remove(p)}
+            class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
+          >
+            Löschen
+          </button>
         </div>
       </div>
     {/each}
