@@ -86,6 +86,21 @@ export function openAiRequest(endpoint: Endpoint, opts: { messages: unknown[]; t
   }
 }
 
+/** Baut die Assistant-Nachricht für den nächsten Request: tool_calls im OpenAI-Wire-Format
+ *  ({ id, type: "function", function: { name, arguments } }) – viele APIs (u. a. DeepSeek)
+ *  lehnen das flache Format { id, name, arguments } mit HTTP 400 ab. */
+export function openAiAssistantMessage(text: string, toolCalls: ToolCallSpec[]): Record<string, unknown> {
+  return {
+    role: 'assistant',
+    content: text || null,
+    tool_calls: toolCalls.map((tc) => ({
+      id: tc.id,
+      type: 'function',
+      function: { name: tc.name, arguments: tc.arguments },
+    })),
+  }
+}
+
 export function parseOpenAiResponse(json: unknown): { text: string; toolCalls: ToolCallSpec[] } {
   const data = json as {
     choices?: { message?: { content?: string | null; tool_calls?: { id?: string; function?: { name?: string; arguments?: string } }[] } }[]

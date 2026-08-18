@@ -15,6 +15,7 @@ import {
   anthropicRequest,
   buildUserContent,
   detectFormat,
+  openAiAssistantMessage,
   openAiRequest,
   parseAnthropicResponse,
   parseOpenAiResponse,
@@ -115,7 +116,7 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
         return
       }
       toolCallsTotal += parsed.toolCalls.length
-      messages.push({ role: 'assistant', content: parsed.text || null, tool_calls: parsed.toolCalls })
+      messages.push(openAiAssistantMessage(parsed.text, parsed.toolCalls))
       port.postMessage({ type: 'progress', message: parsed.toolCalls.length + ' Tool-Aufruf(e) erkannt …' } satisfies PortUpdate)
       for (const call of parsed.toolCalls) {
         const r = await callContentTool(tabId, call)

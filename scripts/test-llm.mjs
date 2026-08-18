@@ -55,6 +55,13 @@ check('Text extrahiert', oaResp.text === 'Hallo', oaResp.text)
 check('2 Tool-Calls erkannt', oaResp.toolCalls.length === 2, oaResp.toolCalls.length)
 check('Tool-Args JSON übernommen', oaResp.toolCalls[0].arguments === '{"selector":"#name","value":"Max"}')
 check('Tool-Call-ID', oaResp.toolCalls[0].id === 'call_1')
+const asst = m.openAiAssistantMessage('Hallo', [
+    { id: 'call_1', name: 'fill_element', arguments: '{"selector":"#x","value":"1"}' },
+  ])
+check('Assistant tool_calls: type=function', asst.tool_calls[0].type === 'function')
+check('Assistant tool_calls: function verschachtelt', asst.tool_calls[0].function.name === 'fill_element' && asst.tool_calls[0].function.arguments.includes('#x'))
+check('Assistant tool_calls: id erhalten', asst.tool_calls[0].id === 'call_1')
+check('Assistant content bei leerem Text = null', m.openAiAssistantMessage('', [{ id: 'c', name: 'click_element', arguments: '{}' }]).content === null)
 const oaNoTools = parseOpenAiResponse({ choices: [{ message: { content: 'fertig' } }] })
 check('ohne Tool-Calls', oaNoTools.toolCalls.length === 0 && oaNoTools.text === 'fertig')
 
