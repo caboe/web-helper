@@ -45,7 +45,10 @@ export interface ToolCallSpec {
 export interface LlmRunRequest {
   endpoint: Endpoint
   systemPrompt: string
+  /** Seiteninhalt der ganzen Seite (Markdown-ähnlich) – immer als Kontext enthalten. */
   userContent: string
+  /** Optional: markierter Ausschnitt – primärer Fokus, falls vorhanden. */
+  selection?: string
   pageUrl: string
   pageTitle: string
   tabId: number

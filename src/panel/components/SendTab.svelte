@@ -22,10 +22,17 @@
   let copied = $state(false)
   let port: chrome.runtime.Port | null = null
 
-  const contentFor = $derived(
-    mode === 'selection' ? (pageState?.hasSelection ? pageState.selection : '') : (pageState?.markdown ?? ''),
+  const selectionFor = $derived(pageState?.hasSelection ? pageState.selection : '')
+  const pageFor = $derived(pageState?.markdown ?? '')
+  const preview = $derived(
+    mode === 'selection'
+      ? selectionFor.length > 600
+        ? selectionFor.slice(0, 600) + ' …'
+        : selectionFor
+      : pageFor.length > 600
+        ? pageFor.slice(0, 600) + ' …'
+        : pageFor,
   )
-  const preview = $derived(contentFor.length > 600 ? contentFor.slice(0, 600) + ' …' : contentFor)
   const running = $derived(status === 'running')
   const endpoint = $derived(endpoints.find((e) => e.id === endpointId) ?? null)
   const prompt = $derived(prompts.find((p) => p.id === promptId) ?? null)
@@ -98,14 +105,21 @@
       status = 'error'
       return
     }
-    let content = mode === 'selection' ? (pageState.hasSelection ? pageState.selection : '') : pageState.markdown
-    if (mode === 'selection' && !content.trim()) {
-      content = pageState.markdown
-      note = 'Keine Markierung gefunden – stattdessen wurde die ganze Seite gesendet.'
+    // Bei „Auswahl“ wird IMMER die ganze Seite als Kontext mitgeschickt,
+    // der markierte Ausschnitt ist der primäre Fokus.
+    let userContent = pageState.markdown
+    let selection: string | undefined = undefined
+    if (mode === 'selection') {
+      if (pageState.hasSelection) {
+        selection = pageState.selection
+        note = 'Auswahl gesendet – ganze Seite als Kontext beigefügt.'
+      } else {
+        note = 'Keine Markierung gefunden – stattdessen wurde die ganze Seite gesendet.'
+      }
     } else {
       note = ''
     }
-    if (!content.trim()) {
+    if (!userContent.trim()) {
       errorMsg = 'Kein Seiteninhalt extrahiert.'
       status = 'error'
       return
@@ -139,7 +153,8 @@
       kind: 'llm-run',
       endpoint,
       systemPrompt: prompt?.prompt ?? '',
-      userContent: content,
+      userContent,
+      selection,
       pageUrl: pageState.url,
       pageTitle: pageState.title,
       tabId: currentTabId,
@@ -237,7 +252,13 @@
       <div class="mb-2 flex items-center justify-between gap-2">
         <span class="truncate text-[11px] font-medium text-zinc-500">{pageState.title}</span>
         <div class="flex shrink-0 items-center gap-2">
-          <span class="text-[10px] text-zinc-400">{contentFor.length.toLocaleString('de-DE')} Zeichen</span>
+          {#if mode === 'selection' && pageState?.hasSelection}
+            <span class="text-[10px] text-zinc-400">
+              Auswahl: {selectionFor.length.toLocaleString('de-DE')} · Seite: {pageFor.length.toLocaleString('de-DE')}
+            </span>
+          {:else}
+            <span class="text-[10px] text-zinc-400">{pageFor.length.toLocaleString('de-DE')} Zeichen</span>
+          {/if}
           <button type="button" onclick={refresh} disabled={refreshing} class={ghost + ' disabled:opacity-50'}>
             {refreshing ? '…' : 'Aktualisieren'}
           </button>

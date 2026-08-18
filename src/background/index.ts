@@ -97,7 +97,7 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
   const format = detectFormat(req.endpoint)
   const model = resolveModel(req.endpoint, format)
   const sys = systemInstruction(req.systemPrompt, req.pageTitle, req.pageUrl)
-  const user = buildUserContent(req.userContent, req.pageTitle, req.pageUrl)
+  const user = buildUserContent(req.userContent, req.pageTitle, req.pageUrl, req.selection)
   const tabId = req.tabId
   let toolCallsTotal = 0
 

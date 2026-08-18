@@ -34,6 +34,7 @@ export function systemInstruction(customPrompt: string, title: string, url: stri
     'Du bist ein hilfreicher Assistent, der direkt auf der aktuellen Webseite des Nutzers arbeitet.',
     'Der Nutzer hat dir Inhalte dieser Seite geschickt. Du kannst per Tool-Calling auf der Seite agieren:',
     'Formulare ausfüllen, Elemente klicken, Text ersetzen und Inhalte lesen.',
+    'Wird ein markierter Ausschnitt mitgeschickt, ist dieser der primäre Fokus der Aufgabe; die ganze Seite dient als zusätzlicher Kontext.',
     'Nutze Tools nur, wenn es für die Aufgabe sinnvoll ist. Antworte auf Deutsch, kurz und präzise.',
   ].join(' ')
   const custom = customPrompt.trim()
@@ -41,9 +42,16 @@ export function systemInstruction(customPrompt: string, title: string, url: stri
   return [custom, header, base].filter(Boolean).join('\n\n')
 }
 
-/** Nutzernachricht mit dem Seiteninhalt. */
-export function buildUserContent(userContent: string, title: string, url: string): string {
-  return ['Seite: ' + title, 'URL: ' + url, '', '--- Seiteninhalt ---', userContent].join('\n')
+/** Nutzernachricht: ganze Seite als Kontext + optional markierter Ausschnitt als primärer Fokus. */
+export function buildUserContent(userContent: string, title: string, url: string, selection?: string): string {
+  const parts = ['Seite: ' + title, 'URL: ' + url]
+  if (selection && selection.trim()) {
+    parts.push('', '--- Markierter Ausschnitt (primärer Fokus) ---')
+    parts.push(selection.trim())
+  }
+  parts.push('', '--- Ganzer Seiteninhalt (Kontext) ---')
+  parts.push(userContent)
+  return parts.join('\n')
 }
 
 // ---------------- OpenAI-kompatible Tool-Definitionen ----------------
