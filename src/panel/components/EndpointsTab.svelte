@@ -215,58 +215,84 @@
       <p class="text-xs text-zinc-400">{t('noEndpoints')}</p>
     {/if}
     {#each endpoints as ep}
-      <div class="flex items-start gap-3 {card} p-3.5">
-        <span
-          class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
-          class:bg-indigo-500={ep.format === 'openai'}
-          class:bg-orange-500={ep.format === 'anthropic'}
-          class:bg-zinc-300={ep.format === 'auto'}
-        ></span>
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2">
-            <span class="truncate text-sm font-medium text-zinc-900">{ep.title}</span>
+      <div class="{card} p-3.5">
+        <!-- Titel + Badge + Icon-Aktionen auf einer Zeile -->
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex min-w-0 items-center gap-2">
+            <span
+              class="h-2.5 w-2.5 shrink-0 rounded-full"
+              class:bg-indigo-500={ep.format === 'openai'}
+              class:bg-orange-500={ep.format === 'anthropic'}
+              class:bg-zinc-300={ep.format === 'auto'}
+            ></span>
+            <span class="truncate text-sm font-medium text-zinc-900" title={ep.title}>{ep.title}</span>
             <span class="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500">
               {formatLabel(ep.format)}
             </span>
           </div>
-          <p class="mt-0.5 truncate text-[11px] text-zinc-500">{ep.url}</p>
-          <p class="text-[11px] text-zinc-400">Modell: {ep.model || 'Standard'}</p>
-          <p class="truncate font-mono text-[10px] text-zinc-400">
-            {ep.apiKey ? t('keyMasked', { prefix: ep.apiKey.slice(0, 6) }) : t('noKey')}
-          </p>
-        </div>
-        <div class="flex shrink-0 flex-col items-end gap-1.5">
-          <div class="flex gap-1">
-            <button type="button" onclick={() => startEdit(ep)} class={ghost}>{t('edit')}</button>
-            <button type="button" onclick={() => copy(ep)} class={ghost}>
-              {copiedId === ep.id ? t('copied') : t('copy')}
+          <div class="flex shrink-0 items-center gap-0.5">
+            <button
+              type="button"
+              onclick={() => test(ep)}
+              disabled={testingId === ep.id}
+              title={testingId === ep.id ? t('testing') : t('testConnection')}
+              aria-label={t('testConnection')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 disabled:cursor-wait disabled:opacity-50"
+            >
+              {#if testingId === ep.id}
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              {:else}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+              {/if}
+            </button>
+            <button
+              type="button"
+              onclick={() => startEdit(ep)}
+              title={t('edit')}
+              aria-label={t('edit')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+            <button
+              type="button"
+              onclick={() => copy(ep)}
+              title={copiedId === ep.id ? t('copied') : t('copy')}
+              aria-label={t('copy')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+              class:text-emerald-500={copiedId === ep.id}
+            >
+              {#if copiedId === ep.id}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              {:else}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              {/if}
             </button>
             <button
               type="button"
               onclick={() => remove(ep)}
-              class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
+              title={t('delete')}
+              aria-label={t('delete')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
             >
-              {t('delete')}
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
             </button>
           </div>
-          <button
-            type="button"
-            onclick={() => test(ep)}
-            disabled={testingId === ep.id}
-            class={ghost + ' disabled:opacity-50'}
-          >
-            {testingId === ep.id ? t('testing') : t('testConnection')}
-          </button>
-          {#if testOutcome && testOutcome.id === ep.id}
-            <p
-              class="text-[10px] font-medium"
-              class:text-emerald-600={testOutcome.ok}
-              class:text-rose-600={!testOutcome.ok}
-            >
-              {testOutcome.ok ? '✓ ' + testOutcome.detail : '✗ ' + testOutcome.detail}
-            </p>
-          {/if}
         </div>
+        <!-- Endpunkt-Info in voller Breite -->
+        <p class="mt-2 truncate text-[11px] text-zinc-500" title={ep.url}>{ep.url}</p>
+        <p class="mt-0.5 truncate text-[10px] text-zinc-400">
+          {t('modelLabel', { model: ep.model || t('modelDefault') })} · {ep.apiKey ? t('keyMasked', { prefix: ep.apiKey.slice(0, 6) }) : t('noKey')}
+        </p>
+        {#if testOutcome && testOutcome.id === ep.id}
+          <p
+            class="mt-1.5 text-[10px] font-medium"
+            class:text-emerald-600={testOutcome.ok}
+            class:text-rose-600={!testOutcome.ok}
+          >
+            {testOutcome.ok ? '✓ ' + testOutcome.detail : '✗ ' + testOutcome.detail}
+          </p>
+        {/if}
       </div>
     {/each}
   </div>
