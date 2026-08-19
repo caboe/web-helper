@@ -18,6 +18,15 @@ export const DEFAULT_MODEL: Record<ApiFormat, string> = {
   anthropic: 'claude-sonnet-4-20250514',
 }
 
+/** Sampling-Parameter – nur senden, soweit die API/Modell sie unterstützt.
+ *  OpenAI-kompatibel: alle vier · Anthropic: nur temperature + top_p (keine Penalties). */
+export const SAMPLING = {
+  temperature: 0.9, // Bereich 0.8–1.0: mehr Variabilität
+  top_p: 0.92, // Bereich 0.9–0.95: natürlichere Wortwahl
+  frequency_penalty: 0.4, // Bereich 0.3–0.5: weniger Wiederholungen
+  presence_penalty: 0.4, // Bereich 0.3–0.5: vielfältigere Themen
+} as const
+
 export function detectFormat(endpoint: Pick<Endpoint, 'url' | 'format'>): ApiFormat {
   if (endpoint.format === 'openai' || endpoint.format === 'anthropic') return endpoint.format
   const url = endpoint.url.toLowerCase()
@@ -76,6 +85,10 @@ export function openAiRequest(endpoint: Endpoint, opts: { messages: unknown[]; t
       tools: openAiTools(opts.tools),
       tool_choice: 'auto',
       max_tokens: opts.maxTokens ?? 4096,
+      temperature: SAMPLING.temperature,
+      top_p: SAMPLING.top_p,
+      frequency_penalty: SAMPLING.frequency_penalty,
+      presence_penalty: SAMPLING.presence_penalty,
     }),
   }
 }
@@ -135,6 +148,9 @@ export function anthropicRequest(endpoint: Endpoint, opts: { messages: unknown[]
       system: opts.system,
       messages: opts.messages,
       tools: anthropicTools(opts.tools),
+      temperature: SAMPLING.temperature,
+      top_p: SAMPLING.top_p,
+      // frequency_penalty / presence_penalty: Anthropic-API unterstützt sie nicht.
     }),
   }
 }
