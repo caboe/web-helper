@@ -33,6 +33,9 @@ Chinese), detected automatically from your browser settings and overridable in t
 - **Use results**: copy the answer or insert it directly at the selection. A live log shows every tool call.
 - **Multilingual**: English, Deutsch, Français, Español and 中文 – auto-detected from the browser, freely
   overridable in Settings → Language.
+- **Vision (optional)**: per endpoint, you can enable "Vision" – then a screenshot of the visible page is
+  sent with every request alongside the text context, so vision-capable models (GPT-4o, Claude, Gemini, …)
+  can also see the actual layout, colors, tables and images.
 
 #### How it works
 1. Open the side panel via the toolbar icon (older Chrome versions automatically fall back to a popup).
@@ -44,6 +47,8 @@ Chinese), detected automatically from your browser settings and overridable in t
 - All data (endpoints, API keys, prompts, settings) stays **strictly local** in your browser (chrome.storage).
 - **No data is sent to third parties.** Requests go directly from your browser to the endpoint you configured.
 - API keys never leave your browser.
+- **Vision is opt-in**: screenshots of the visible page are only sent when you enable the Vision flag on an
+  endpoint – and then only to that endpoint.
 - The extension needs access to all websites ("<all_urls>") to run DOM tools and reach arbitrary,
   self-configured LLM endpoints.
 

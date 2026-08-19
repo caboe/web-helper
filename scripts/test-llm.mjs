@@ -88,6 +88,15 @@ check('Anthropic top_p', anBody.top_p === 0.92, anBody.top_p)
 check('Anthropic OHNE frequency_penalty', !('frequency_penalty' in anBody), JSON.stringify(anBody).slice(0, 80))
 check('Anthropic OHNE presence_penalty', !('presence_penalty' in anBody))
 
+console.log('Vision-Content:')
+const shot = 'data:image/jpeg;base64,AAAA'
+const vis = m.openAiVisionContent('TEXT', shot)
+check('OpenAI: 2 Blöcke', vis.length === 2, vis.length)
+check('OpenAI: text + image_url', vis[0].type === 'text' && vis[0].text === 'TEXT' && vis[1].type === 'image_url' && vis[1].image_url.url === shot)
+const anv = m.anthropicVisionContent('TEXT', shot)
+check('Anthropic: 2 Blöcke', anv.length === 2)
+check('Anthropic: image mit base64', anv[1].type === 'image' && anv[1].source.type === 'base64' && anv[1].source.media_type === 'image/jpeg' && anv[1].source.data === 'AAAA')
+
 console.log('Anthropic-Response-Parsing:')
 const anResp = parseAnthropicResponse({
   content: [

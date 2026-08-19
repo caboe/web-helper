@@ -10,6 +10,8 @@ export interface Endpoint {
   apiKey: string
   model: string
   format: EndpointFormat
+  /** Vision: sichtbaren Bereich der Seite als Screenshot mit jeder Anfrage senden (nur Vision-Modelle). */
+  vision?: boolean
 }
 
 export interface SystemPrompt {
@@ -82,12 +84,14 @@ export type ContentRequest =
   | { kind: 'get-state' }
   | { kind: 'tool'; id: string; name: DomToolName; args: Record<string, unknown>; locale: Locale }
   | { kind: 'insert-text'; text: string; mode: 'replace' | 'insert' }
+  | { kind: 'process-screenshot'; dataUrl: string }
 
 export type ContentResponse =
   | { kind: 'pong' }
   | { kind: 'state'; state: PageState }
   | { kind: 'tool-result'; id: string; ok: boolean; output: string }
   | { kind: 'insert-result'; ok: boolean }
+  | { kind: 'screenshot-result'; ok: boolean; dataUrl?: string }
 
 // ---------- Background-Messages (Panel -> Background) ----------
 

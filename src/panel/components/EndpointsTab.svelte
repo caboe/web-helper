@@ -14,6 +14,7 @@
   let apiKey = $state('')
   let model = $state('')
   let format = $state<EndpointFormat>('auto')
+  let vision = $state(false)
   let showKey = $state(false)
   let formError = $state('')
   let testingId = $state<string | null>(null)
@@ -36,6 +37,7 @@
     apiKey = ''
     model = ''
     format = 'auto'
+    vision = false
     showKey = false
     formError = ''
     testOutcome = null
@@ -49,6 +51,7 @@
     apiKey = ''
     model = ep.model
     format = ep.format
+    vision = ep.vision ?? false
     showKey = false
     formError = ''
     testOutcome = null
@@ -74,6 +77,7 @@
     url = t.url
     model = t.model
     format = t.format
+    vision = false
     apiKey = ''
     showKey = false
     formError = ''
@@ -99,6 +103,7 @@
       apiKey: apiKey.trim() || (existing?.apiKey ?? ''),
       model: model.trim(),
       format,
+      vision,
     }
     const list = editingId ? endpoints.map((e) => (e.id === editingId ? ep : e)) : [...endpoints, ep]
     onChange(list)
@@ -193,6 +198,17 @@
           <option value="anthropic">{t('formatAnthropicOption')}</option>
         </select>
       </div>
+      <label class="flex cursor-pointer items-start gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+        <input
+          type="checkbox"
+          bind:checked={vision}
+          class="mt-0.5 h-4 w-4 rounded border-zinc-300 text-indigo-600 accent-indigo-600 focus:ring-indigo-500/30"
+        />
+        <span class="flex flex-col gap-0.5">
+          <span class="text-xs font-medium text-zinc-800">{t('visionLabel')}</span>
+          <span class="text-[10px] leading-relaxed text-zinc-500">{t('visionHint')}</span>
+        </span>
+      </label>
       <p class="text-[10px] leading-relaxed text-zinc-400">
         {t('formatHint')}
       </p>
@@ -229,6 +245,11 @@
             <span class="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-zinc-500">
               {formatLabel(ep.format)}
             </span>
+            {#if ep.vision}
+              <span class="shrink-0 rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-600">
+                {t('visionBadge')}
+              </span>
+            {/if}
           </div>
           <div class="flex shrink-0 items-center gap-0.5">
             <button

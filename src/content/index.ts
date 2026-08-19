@@ -361,6 +361,32 @@ if (!window[INJECTION_KEY]) {
     return true
   }
 
+  // ---------- Screenshot verkleinern ----------
+
+  async function processScreenshot(dataUrl: string): Promise<{ ok: boolean; dataUrl?: string }> {
+    try {
+      const img = new Image()
+      await new Promise<void>((res, rej) => {
+        img.onload = () => res()
+        img.onerror = () => rej(new Error('Bild konnte nicht geladen werden'))
+        img.src = dataUrl
+      })
+      const MAX = 1280
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height))
+      const w = Math.max(1, Math.round(img.width * scale))
+      const h = Math.max(1, Math.round(img.height * scale))
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return { ok: false }
+      ctx.drawImage(img, 0, 0, w, h)
+      return { ok: true, dataUrl: canvas.toDataURL('image/jpeg', 0.72) }
+    } catch {
+      return { ok: false }
+    }
+  }
+
   // ---------- Message-Handler ----------
 
   function pageState(): PageState {
@@ -387,6 +413,10 @@ if (!window[INJECTION_KEY]) {
       case 'insert-text': {
         const ok = await insertText(msg.text, msg.mode)
         return { kind: 'insert-result', ok }
+      }
+      case 'process-screenshot': {
+        const r = await processScreenshot(msg.dataUrl)
+        return { kind: 'screenshot-result', ok: r.ok, dataUrl: r.dataUrl }
       }
     }
   }

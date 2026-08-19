@@ -17,6 +17,8 @@ import {
   detectFormat,
   openAiAssistantMessage,
   openAiRequest,
+  openAiVisionContent,
+  anthropicVisionContent,
   parseAnthropicResponse,
   parseOpenAiResponse,
   resolveModel,
@@ -64,6 +66,23 @@ async function ensureContentScript(tabId: number): Promise<boolean> {
   }
 }
 
+/** Erfasst den sichtbaren Bereich als JPEG und verkleinert ihn über das Content-Script (Canvas). */
+async function captureProcessedScreenshot(tabId: number): Promise<string | null> {
+  try {
+    const tab = await chrome.tabs.get(tabId)
+    const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 60 })
+    try {
+      const resp = (await chrome.tabs.sendMessage(tabId, { kind: 'process-screenshot', dataUrl })) as ContentResponse
+      if (resp?.kind === 'screenshot-result' && resp.ok && resp.dataUrl) return resp.dataUrl
+    } catch {
+      /* Content-Script nicht verfügbar – Original-Capture verwenden */
+    }
+    return dataUrl
+  } catch {
+    return null
+  }
+}
+
 function safeParseArgs(json: string): Record<string, unknown> {
   try {
     const v = JSON.parse(json)
@@ -103,12 +122,22 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
   const sys = systemInstruction(req.systemPrompt, req.pageTitle, req.pageUrl, req.locale)
   const user = buildUserContent(req.userContent, req.pageTitle, req.pageUrl, req.selection, req.locale)
   const tabId = req.tabId
+
+  // Vision: Screenshot des sichtbaren Bereichs erfassen und dem User-Content hinzufügen
+  let userContent: unknown = user
+  if (req.endpoint.vision) {
+    const shot = await captureProcessedScreenshot(tabId)
+    if (shot) {
+      port.postMessage({ type: 'progress', message: t(locale, 'progressVision') } satisfies PortUpdate)
+      userContent = format === 'openai' ? openAiVisionContent(user, shot) : anthropicVisionContent(user, shot)
+    }
+  }
   let toolCallsTotal = 0
 
   if (format === 'openai') {
     const messages: unknown[] = [
       { role: 'system', content: sys },
-      { role: 'user', content: user },
+      { role: 'user', content: userContent },
     ]
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
       const { url, headers, body } = openAiRequest(req.endpoint, { messages, tools: TOOL_DEFS })
@@ -131,7 +160,7 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
   }
 
   // Anthropic
-  const messages: unknown[] = [{ role: 'user', content: user }]
+  const messages: unknown[] = [{ role: 'user', content: userContent }]
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
     const { url, headers, body } = anthropicRequest(req.endpoint, { messages, system: sys, tools: TOOL_DEFS })
     const json = await fetchJson(url, headers, body, locale)

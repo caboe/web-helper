@@ -67,6 +67,28 @@ export function openAiTools(tools: ToolDef[]): unknown[] {
   return tools.map(openAiTool)
 }
 
+/** User-Content mit Bild (OpenAI-kompatibel): Text + image_url. */
+export function openAiVisionContent(text: string, imageDataUrl: string): unknown[] {
+  return [
+    { type: 'text', text },
+    { type: 'image_url', image_url: { url: imageDataUrl } },
+  ]
+}
+
+/** User-Content mit Bild (Anthropic): Text + base64-Image-Block. */
+export function anthropicVisionContent(text: string, imageDataUrl: string): unknown[] {
+  const { mediaType, data } = splitDataUrl(imageDataUrl)
+  return [
+    { type: 'text', text },
+    { type: 'image', source: { type: 'base64', media_type: mediaType, data } },
+  ]
+}
+
+function splitDataUrl(dataUrl: string): { mediaType: string; data: string } {
+  const m = /^data:([^;,]+);base64,(.+)$/s.exec(dataUrl)
+  return m ? { mediaType: m[1] ?? 'image/jpeg', data: m[2] ?? '' } : { mediaType: 'image/jpeg', data: dataUrl }
+}
+
 export function openAiRequest(endpoint: Endpoint, opts: { messages: unknown[]; tools: ToolDef[]; maxTokens?: number }): {
   url: string
   headers: Record<string, string>
