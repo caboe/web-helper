@@ -2,6 +2,7 @@
   import type { SystemPrompt } from '../../shared/types'
   import { newId } from '../lib/storage'
   import { copyText } from '../lib/clipboard'
+  import { t } from '../lib/i18n.svelte'
 
   let { prompts, onChange }: { prompts: SystemPrompt[]; onChange: (list: SystemPrompt[]) => void } = $props()
 
@@ -34,11 +35,11 @@
 
   function submit() {
     if (!title.trim()) {
-      formError = 'Bitte einen Titel angeben.'
+      formError = t('errTitle')
       return
     }
     if (!text.trim()) {
-      formError = 'Bitte einen Prompt-Text angeben.'
+      formError = t('errPromptText')
       return
     }
     const sp: SystemPrompt = {
@@ -52,7 +53,7 @@
   }
 
   function remove(p: SystemPrompt) {
-    if (!confirm('Systemprompt „' + p.title + '“ wirklich löschen?')) return
+    if (!confirm(t('confirmDeletePrompt', { title: p.title }))) return
     onChange(prompts.filter((x) => x.id !== p.id))
     if (editingId === p.id) resetForm()
   }
@@ -78,26 +79,26 @@
     class={card + ' p-4'}
   >
     <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? 'Systemprompt bearbeiten' : 'Neuer Systemprompt'}</h2>
+      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? t('editPrompt') : t('newPrompt')}</h2>
       {#if editingId}
         <button type="button" onclick={resetForm} class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700">
-          Abbrechen
+          {t('cancel')}
         </button>
       {/if}
     </div>
     <div class="flex flex-col gap-2.5">
-      <input bind:value={title} type="text" placeholder="Titel, z. B. „Formular-Assistent“" class={input} />
+      <input bind:value={title} type="text" placeholder={t('phPromptTitle')} class={input} />
       <textarea
         bind:value={text}
         rows={6}
-        placeholder="Anweisungen für das Modell, z. B.: Fülle die Formularfelder der Seite mit den Daten aus dem Kontext …"
+        placeholder={t('phPromptText')}
         class={input + ' resize-y'}
       ></textarea>
       {#if formError}
         <p class="text-xs font-medium text-rose-600">{formError}</p>
       {/if}
       <button type="submit" class={primary}>
-        {editingId ? 'Speichern' : 'Hinzufügen'}
+        {editingId ? t('save') : t('add')}
       </button>
     </div>
   </form>
@@ -105,11 +106,11 @@
   <!-- Liste -->
   <div class="flex flex-col gap-2.5">
     <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
-      Übersicht
+      {t('overview', { n: prompts.length })}
       <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{prompts.length}</span>
     </h2>
     {#if prompts.length === 0}
-      <p class="text-xs text-zinc-400">Noch keine Systemprompts angelegt.</p>
+      <p class="text-xs text-zinc-400">{t('noPrompts')}</p>
     {/if}
     {#each prompts as p}
       <div class="flex items-start justify-between gap-3 {card} p-3.5">
@@ -120,16 +121,16 @@
           </p>
         </div>
         <div class="flex shrink-0 gap-1">
-          <button type="button" onclick={() => startEdit(p)} class={ghost}>Bearbeiten</button>
+          <button type="button" onclick={() => startEdit(p)} class={ghost}>{t('edit')}</button>
           <button type="button" onclick={() => copy(p)} class={ghost}>
-            {copiedId === p.id ? 'Kopiert ✓' : 'Kopieren'}
+            {copiedId === p.id ? t('copied') : t('copy')}
           </button>
           <button
             type="button"
             onclick={() => remove(p)}
             class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
           >
-            Löschen
+            {t('delete')}
           </button>
         </div>
       </div>

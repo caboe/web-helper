@@ -33,6 +33,7 @@ export async function loadSettings(): Promise<Settings> {
   return (data[KEY_SETTINGS] as Settings) ?? {}
 }
 
-export async function saveSettings(s: Settings): Promise<void> {
-  await chrome.storage.local.set({ [KEY_SETTINGS]: s })
+export async function saveSettings(partial: Partial<Settings>): Promise<void> {
+  const prev = await loadSettings()
+  await chrome.storage.local.set({ [KEY_SETTINGS]: { ...prev, ...partial } })
 }

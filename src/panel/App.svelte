@@ -3,6 +3,7 @@
   import SendTab from './components/SendTab.svelte'
   import EndpointsTab from './components/EndpointsTab.svelte'
   import SettingsTab from './components/SettingsTab.svelte'
+  import { t, initI18n } from './lib/i18n.svelte'
   import { loadEndpoints, loadPrompts, saveEndpoints, savePrompts } from './lib/storage'
   import type { Endpoint, SystemPrompt } from '../shared/types'
 
@@ -13,7 +14,7 @@
   let prompts: SystemPrompt[] = $state([])
 
   onMount(async () => {
-    const [e, p] = await Promise.all([loadEndpoints(), loadPrompts()])
+    const [e, p] = await Promise.all([loadEndpoints(), loadPrompts(), initI18n()])
     endpoints = e
     prompts = p
   })
@@ -28,10 +29,10 @@
     savePrompts(list)
   }
 
-  const tabs: { id: TabId; label: string }[] = [
-    { id: 'action', label: 'Aktion' },
-    { id: 'settings', label: 'Settings' },
-  ]
+  const tabs = $derived<{ id: TabId; label: string }[]>([
+    { id: 'action', label: t('tabAction') },
+    { id: 'settings', label: t('tabSettings') },
+  ])
 </script>
 
 <div class="flex h-full flex-col bg-[#fafaf9] text-zinc-900">
@@ -71,6 +72,6 @@
   </main>
 
   <footer class="border-t border-zinc-200/70 bg-white/60 px-4 py-2 text-[10px] text-zinc-400">
-    Auswahl markieren &amp; mit Systemprompt + Endpunkt senden · Tools: Füllen, Klicken, Text, Lesen
+    {t('footer')}
   </footer>
 </div>

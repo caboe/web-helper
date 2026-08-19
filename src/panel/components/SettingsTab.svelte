@@ -1,6 +1,8 @@
 <script lang="ts">
   import EndpointsTab from './EndpointsTab.svelte'
   import PromptsTab from './PromptsTab.svelte'
+  import LanguageTab from './LanguageTab.svelte'
+  import { t } from '../lib/i18n.svelte'
   import type { Endpoint, SystemPrompt } from '../../shared/types'
 
   let { endpoints, prompts, onEndpointsChange, onPromptsChange } = $props<{
@@ -10,7 +12,7 @@
     onPromptsChange: (list: SystemPrompt[]) => void
   }>()
 
-  type SubTab = 'endpoints' | 'prompts'
+  type SubTab = 'endpoints' | 'prompts' | 'language'
   let sub = $state<SubTab>('endpoints')
 </script>
 
@@ -27,7 +29,7 @@
         class:text-zinc-500={sub !== 'endpoints'}
         class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
-        Endpunkte
+        {t('subEndpoints')}
       </button>
       <button
         type="button"
@@ -38,14 +40,27 @@
         class:text-zinc-500={sub !== 'prompts'}
         class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
-        Prompts
+        {t('subPrompts')}
+      </button>
+      <button
+        type="button"
+        onclick={() => (sub = 'language')}
+        class:bg-white={sub === 'language'}
+        class:shadow-sm={sub === 'language'}
+        class:text-zinc-900={sub === 'language'}
+        class:text-zinc-500={sub !== 'language'}
+        class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
+      >
+        {t('subLanguage')}
       </button>
     </div>
   </div>
 
   {#if sub === 'endpoints'}
     <EndpointsTab {endpoints} onChange={onEndpointsChange} />
-  {:else}
+  {:else if sub === 'prompts'}
     <PromptsTab {prompts} onChange={onPromptsChange} />
+  {:else}
+    <LanguageTab />
   {/if}
 </div>

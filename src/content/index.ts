@@ -13,6 +13,83 @@ declare global {
 if (!window[INJECTION_KEY]) {
   window[INJECTION_KEY] = true
 
+  // ---------- lokale Tool-Meldungen (5 Sprachen) ----------
+  type CsKey = 'elementNotFound' | 'filled' | 'selectFilled' | 'contentEditable' | 'filledFallback' | 'clicked' | 'textReplaced' | 'selectionReplaced' | 'selectionReplacedNow' | 'noSelectorOrSelection' | 'unknownTool'
+  const CS_MSGS: Record<string, Record<CsKey, string>> = {
+    de: {
+      elementNotFound: 'Element nicht gefunden: {s}',
+      filled: 'OK: {s} gesetzt auf "{v}"',
+      selectFilled: 'OK: Select {s} auf "{v}" gesetzt',
+      contentEditable: 'OK: contenteditable {s} befüllt',
+      filledFallback: 'OK: {s} befüllt (Fallback)',
+      clicked: 'OK: {s} geklickt',
+      textReplaced: 'OK: Inhalt von {s} ersetzt',
+      selectionReplaced: 'OK: Markierung durch neuen Text ersetzt',
+      selectionReplacedNow: 'OK: aktuelle Markierung ersetzt',
+      noSelectorOrSelection: 'Kein Element-Selektor und keine Markierung vorhanden.',
+      unknownTool: 'Unbekanntes Tool: {s}',
+    },
+    en: {
+      elementNotFound: 'Element not found: {s}',
+      filled: 'OK: {s} set to "{v}"',
+      selectFilled: 'OK: select {s} set to "{v}"',
+      contentEditable: 'OK: contenteditable {s} filled',
+      filledFallback: 'OK: {s} filled (fallback)',
+      clicked: 'OK: {s} clicked',
+      textReplaced: 'OK: content of {s} replaced',
+      selectionReplaced: 'OK: selection replaced with new text',
+      selectionReplacedNow: 'OK: current selection replaced',
+      noSelectorOrSelection: 'No element selector and no selection available.',
+      unknownTool: 'Unknown tool: {s}',
+    },
+    fr: {
+      elementNotFound: 'Élément introuvable : {s}',
+      filled: 'OK : {s} défini sur « {v} »',
+      selectFilled: 'OK : sélecteur {s} défini sur « {v} »',
+      contentEditable: 'OK : contenteditable {s} rempli',
+      filledFallback: 'OK : {s} rempli (solution de repli)',
+      clicked: 'OK : {s} cliqué',
+      textReplaced: 'OK : contenu de {s} remplacé',
+      selectionReplaced: 'OK : sélection remplacée par le nouveau texte',
+      selectionReplacedNow: 'OK : sélection actuelle remplacée',
+      noSelectorOrSelection: 'Aucun sélecteur d’élément et aucune sélection disponibles.',
+      unknownTool: 'Outil inconnu : {s}',
+    },
+    es: {
+      elementNotFound: 'Elemento no encontrado: {s}',
+      filled: 'OK: {s} establecido en «{v}»',
+      selectFilled: 'OK: selector {s} establecido en «{v}»',
+      contentEditable: 'OK: contenteditable {s} rellenado',
+      filledFallback: 'OK: {s} rellenado (respaldo)',
+      clicked: 'OK: {s} clicado',
+      textReplaced: 'OK: contenido de {s} reemplazado',
+      selectionReplaced: 'OK: selección reemplazada por el nuevo texto',
+      selectionReplacedNow: 'OK: selección actual reemplazada',
+      noSelectorOrSelection: 'No hay selector de elemento ni selección disponibles.',
+      unknownTool: 'Herramienta desconocida: {s}',
+    },
+    zh: {
+      elementNotFound: '未找到元素：{s}',
+      filled: 'OK：{s} 已设置为“{v}”',
+      selectFilled: 'OK：选择框 {s} 已设置为“{v}”',
+      contentEditable: 'OK：可编辑元素 {s} 已填充',
+      filledFallback: 'OK：{s} 已填充（备用方案）',
+      clicked: 'OK：{s} 已点击',
+      textReplaced: 'OK：{s} 的内容已替换',
+      selectionReplaced: 'OK：选区已替换为新文本',
+      selectionReplacedNow: 'OK：当前选区已替换',
+      noSelectorOrSelection: '没有元素选择器，也没有可用选区。',
+      unknownTool: '未知工具：{s}',
+    },
+  }
+  function cs(locale: string, key: CsKey, vars?: Record<string, string>): string {
+    let s: string = CS_MSGS[locale]?.[key] ?? CS_MSGS['de']?.[key] ?? key
+    if (vars) {
+      for (const [k, v] of Object.entries(vars)) s = s.split('{' + k + '}').join(v)
+    }
+    return s
+  }
+
   // ---------- letzte Markierung merken ----------
   interface SavedSelection {
     anchorNode: Node | null
@@ -149,12 +226,13 @@ if (!window[INJECTION_KEY]) {
 
   function readElementText(selector: string): string {
     const el = querySelector(selector)
-    if (!el) throw new Error('Element nicht gefunden: ' + selector)
+    if (!el) throw new Error(cs(currentLocale, 'elementNotFound', { s: selector }))
     const text = (el as HTMLElement).innerText || el.textContent || ''
     return text.trim().slice(0, MAX_EXTRACT_CHARS)
   }
 
   // ---------- Tool-Ausführung ----------
+  let currentLocale = 'de'
 
   function querySelector(selector: string): Element | null {
     try {
@@ -178,60 +256,60 @@ if (!window[INJECTION_KEY]) {
 
   function fillElement(selector: string, value: string): string {
     const el = querySelector(selector)
-    if (!el) throw new Error('Element nicht gefunden: ' + selector)
+    if (!el) throw new Error(cs(currentLocale, 'elementNotFound', { s: selector }))
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       setNativeValue(el, value)
       dispatchEvents(el)
-      return 'OK: ' + selector + ' gesetzt auf "' + value.slice(0, 100) + '"'
+      return cs(currentLocale, 'filled', { s: selector, v: value.slice(0, 100) })
     }
     if (el instanceof HTMLSelectElement) {
       el.value = value
       dispatchEvents(el)
-      return 'OK: Select ' + selector + ' auf "' + value + '" gesetzt'
+      return cs(currentLocale, 'selectFilled', { s: selector, v: value })
     }
     if ((el as HTMLElement).isContentEditable) {
       el.textContent = value
       dispatchEvents(el)
-      return 'OK: contenteditable ' + selector + ' befüllt'
+      return cs(currentLocale, 'contentEditable', { s: selector })
     }
     // Fallback: direkt schreiben
     ;(el as HTMLElement).textContent = value
     dispatchEvents(el)
-    return 'OK: ' + selector + ' befüllt (Fallback)'
+    return cs(currentLocale, 'filledFallback', { s: selector })
   }
 
   function clickElement(selector: string): string {
     const el = querySelector(selector)
-    if (!el) throw new Error('Element nicht gefunden: ' + selector)
+    if (!el) throw new Error(cs(currentLocale, 'elementNotFound', { s: selector }))
     const target = el as HTMLElement
     target.scrollIntoView({ block: 'center', behavior: 'smooth' })
     target.click()
-    return 'OK: ' + selector + ' geklickt'
+    return cs(currentLocale, 'clicked', { s: selector })
   }
 
   function setText(text: string, selector?: string): string {
     if (selector) {
       const el = querySelector(selector)
-      if (!el) throw new Error('Element nicht gefunden: ' + selector)
+      if (!el) throw new Error(cs(currentLocale, 'elementNotFound', { s: selector }))
       ;(el as HTMLElement).innerText = text
       dispatchEvents(el)
-      return 'OK: Inhalt von ' + selector + ' ersetzt'
+      return cs(currentLocale, 'textReplaced', { s: selector })
     }
     // markierten Text ersetzen
     const range = restoreSelection()
     if (range) {
       range.deleteContents()
       range.insertNode(document.createTextNode(text))
-      return 'OK: Markierung durch neuen Text ersetzt'
+      return cs(currentLocale, 'selectionReplaced')
     }
     const sel = window.getSelection()
     if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
       const r = sel.getRangeAt(0)
       r.deleteContents()
       r.insertNode(document.createTextNode(text))
-      return 'OK: aktuelle Markierung ersetzt'
+      return cs(currentLocale, 'selectionReplacedNow')
     }
-    throw new Error('Kein Element-Selektor und keine Markierung vorhanden.')
+    throw new Error(cs(currentLocale, 'noSelectorOrSelection'))
   }
 
   async function runTool(name: DomToolName, args: Record<string, unknown>): Promise<{ ok: boolean; output: string }> {
@@ -251,7 +329,7 @@ if (!window[INJECTION_KEY]) {
           output = args.selector ? readElementText(String(args.selector)) : extractMarkdown()
           break
         default:
-          throw new Error('Unbekanntes Tool: ' + name)
+          throw new Error(cs(currentLocale, 'unknownTool', { s: name }))
       }
       return { ok: true, output }
     } catch (e) {
@@ -302,6 +380,7 @@ if (!window[INJECTION_KEY]) {
       case 'get-state':
         return { kind: 'state', state: pageState() }
       case 'tool': {
+        currentLocale = msg.locale ?? 'de'
         const r = await runTool(msg.name, msg.args)
         return { kind: 'tool-result', id: msg.id, ok: r.ok, output: r.output }
       }

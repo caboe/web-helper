@@ -1,6 +1,7 @@
 // Reine Funktionen für OpenAI-kompatible und Anthropic API-Aufrufe.
 // Enthalten KEINE chrome.* APIs, damit sie in Node getestet werden können.
 import type { Endpoint, ToolCallSpec } from './types'
+import { t, type Locale } from './i18n'
 
 export type ApiFormat = 'openai' | 'anthropic'
 
@@ -29,27 +30,20 @@ export function resolveModel(endpoint: Endpoint, format: ApiFormat): string {
 }
 
 /** Basis-Systeminstruktion, beschreibt Rolle + Tools. */
-export function systemInstruction(customPrompt: string, title: string, url: string): string {
-  const base = [
-    'Du bist ein hilfreicher Assistent, der direkt auf der aktuellen Webseite des Nutzers arbeitet.',
-    'Der Nutzer hat dir Inhalte dieser Seite geschickt. Du kannst per Tool-Calling auf der Seite agieren:',
-    'Formulare ausfüllen, Elemente klicken, Text ersetzen und Inhalte lesen.',
-    'Wird ein markierter Ausschnitt mitgeschickt, ist dieser der primäre Fokus der Aufgabe; die ganze Seite dient als zusätzlicher Kontext.',
-    'Nutze Tools nur, wenn es für die Aufgabe sinnvoll ist. Antworte auf Deutsch, kurz und präzise.',
-  ].join(' ')
+export function systemInstruction(customPrompt: string, title: string, url: string, locale: Locale = 'de'): string {
   const custom = customPrompt.trim()
-  const header = 'Aktuelle Seite: "' + title + '" (' + url + ')'
-  return [custom, header, base].filter(Boolean).join('\n\n')
+  const header = t(locale, 'sysPageTitle', { title }) + ' (' + url + ')'
+  return [custom, header, t(locale, 'sysBase')].filter(Boolean).join('\n\n')
 }
 
 /** Nutzernachricht: ganze Seite als Kontext + optional markierter Ausschnitt als primärer Fokus. */
-export function buildUserContent(userContent: string, title: string, url: string, selection?: string): string {
-  const parts = ['Seite: ' + title, 'URL: ' + url]
+export function buildUserContent(userContent: string, title: string, url: string, selection?: string, locale: Locale = 'de'): string {
+  const parts = [t(locale, 'sysPageTitle', { title }), t(locale, 'sysUrl', { url })]
   if (selection && selection.trim()) {
-    parts.push('', '--- Markierter Ausschnitt (primärer Fokus) ---')
+    parts.push('', t(locale, 'sysSelectionHeader'))
     parts.push(selection.trim())
   }
-  parts.push('', '--- Ganzer Seiteninhalt (Kontext) ---')
+  parts.push('', t(locale, 'sysContextHeader'))
   parts.push(userContent)
   return parts.join('\n')
 }

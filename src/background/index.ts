@@ -22,6 +22,7 @@ import {
   resolveModel,
   systemInstruction,
 } from '../shared/llm'
+import { t, type Locale } from '../shared/i18n'
 
 // ---------- Setup ----------
 
@@ -72,18 +73,19 @@ function safeParseArgs(json: string): Record<string, unknown> {
   }
 }
 
-async function callContentTool(tabId: number, call: ToolCallSpec): Promise<{ ok: boolean; output: string }> {
+async function callContentTool(tabId: number, call: ToolCallSpec, locale: Locale): Promise<{ ok: boolean; output: string }> {
   try {
     const resp = (await chrome.tabs.sendMessage(tabId, {
       kind: 'tool',
       id: call.id,
       name: call.name,
       args: safeParseArgs(call.arguments),
+      locale,
     })) as ContentResponse
     if (resp?.kind === 'tool-result') return { ok: resp.ok, output: resp.output }
-    return { ok: false, output: 'Keine Antwort vom Content-Script.' }
+    return { ok: false, output: t(locale, 'bgNoResponse') }
   } catch (e) {
-    return { ok: false, output: 'Tool-Fehler: ' + String(e) }
+    return { ok: false, output: t(locale, 'bgToolError', { msg: String(e) }) }
   }
 }
 
@@ -97,8 +99,9 @@ interface ToolResultMsg {
 async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise<void> {
   const format = detectFormat(req.endpoint)
   const model = resolveModel(req.endpoint, format)
-  const sys = systemInstruction(req.systemPrompt, req.pageTitle, req.pageUrl)
-  const user = buildUserContent(req.userContent, req.pageTitle, req.pageUrl, req.selection)
+  const locale: Locale = req.locale ?? 'de'
+  const sys = systemInstruction(req.systemPrompt, req.pageTitle, req.pageUrl, req.locale)
+  const user = buildUserContent(req.userContent, req.pageTitle, req.pageUrl, req.selection, req.locale)
   const tabId = req.tabId
   let toolCallsTotal = 0
 
@@ -109,7 +112,7 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
     ]
     for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
       const { url, headers, body } = openAiRequest(req.endpoint, { messages, tools: TOOL_DEFS })
-      const text = await fetchJson(url, headers, body)
+      const text = await fetchJson(url, headers, body, locale)
       const parsed = parseOpenAiResponse(text)
       if (parsed.toolCalls.length === 0) {
         port.postMessage({ type: 'done', result: { text: parsed.text, toolCalls: toolCallsTotal, model } } satisfies PortUpdate)
@@ -119,19 +122,19 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
       messages.push(openAiAssistantMessage(parsed.text, parsed.toolCalls))
       port.postMessage({ type: 'progress', message: parsed.toolCalls.length + ' Tool-Aufruf(e) erkannt …' } satisfies PortUpdate)
       for (const call of parsed.toolCalls) {
-        const r = await callContentTool(tabId, call)
+        const r = await callContentTool(tabId, call, locale)
         port.postMessage({ type: 'tool', name: call.name, args: call.arguments, result: r.output } satisfies PortUpdate)
         messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(r satisfies ToolResultMsg) })
       }
     }
-    throw new Error('Zu viele Tool-Iterationen (' + MAX_TOOL_ITERATIONS + ').')
+    throw new Error(t(locale, 'bgTooManyIterations', { n: MAX_TOOL_ITERATIONS }))
   }
 
   // Anthropic
   const messages: unknown[] = [{ role: 'user', content: user }]
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
     const { url, headers, body } = anthropicRequest(req.endpoint, { messages, system: sys, tools: TOOL_DEFS })
-    const json = await fetchJson(url, headers, body)
+    const json = await fetchJson(url, headers, body, locale)
     const parsed = parseAnthropicResponse(json)
     if (parsed.toolCalls.length === 0) {
       port.postMessage({ type: 'done', result: { text: parsed.text, toolCalls: toolCallsTotal, model } } satisfies PortUpdate)
@@ -141,27 +144,27 @@ async function runLlmRun(port: chrome.runtime.Port, req: LlmRunRequest): Promise
     messages.push({ role: 'assistant', content: parsed.blocks })
     port.postMessage({ type: 'progress', message: parsed.toolCalls.length + ' Tool-Aufruf(e) erkannt …' } satisfies PortUpdate)
     for (const call of parsed.toolCalls) {
-      const r = await callContentTool(tabId, call)
+      const r = await callContentTool(tabId, call, locale)
       port.postMessage({ type: 'tool', name: call.name, args: call.arguments, result: r.output } satisfies PortUpdate)
       messages.push({ role: 'user', content: [{ type: 'tool_result', tool_use_id: call.id, content: JSON.stringify(r satisfies ToolResultMsg) }] })
     }
   }
-  throw new Error('Zu viele Tool-Iterationen (' + MAX_TOOL_ITERATIONS + ').')
+  throw new Error(t(locale, 'bgTooManyIterations', { n: MAX_TOOL_ITERATIONS }))
 }
 
-async function fetchJson(url: string, headers: Record<string, string>, body: string): Promise<unknown> {
+async function fetchJson(url: string, headers: Record<string, string>, body: string, locale: Locale): Promise<unknown> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 120_000)
   try {
     const resp = await fetch(url, { method: 'POST', headers, body, signal: controller.signal })
     const text = await resp.text()
     if (!resp.ok) {
-      throw new Error('HTTP ' + resp.status + ' von ' + url + ': ' + text.slice(0, 400))
+      throw new Error(t(locale, 'bgHttpError', { status: resp.status, url, body: text.slice(0, 400) }))
     }
     try {
       return JSON.parse(text)
     } catch {
-      throw new Error('Ungültige JSON-Antwort von ' + url)
+      throw new Error(t(locale, 'bgInvalidJson', { url }))
     }
   } finally {
     clearTimeout(timer)
@@ -178,7 +181,7 @@ chrome.runtime.onConnect.addListener((port) => {
       try {
         const ok = await ensureContentScript(msg.tabId)
         if (!ok) {
-          throw new Error('Kein Zugriff auf diese Seite (Content-Script nicht verfügbar). chrome://-Seiten werden nicht unterstützt.')
+          throw new Error(t(msg.locale ?? 'de', 'bgNoAccess'))
         }
         await runLlmRun(port, msg)
       } catch (e) {
@@ -206,7 +209,7 @@ chrome.runtime.onMessage.addListener((msg: BackgroundRequest, _sender, sendRespo
         case 'page-state': {
           const ok = await ensureContentScript(msg.tabId)
           if (!ok) {
-            sendResponse({ ok: false, error: 'Kein Zugriff auf diese Seite.' })
+            sendResponse({ ok: false, error: t(msg.locale ?? 'de', 'bgNoAccess') })
             return
           }
           const resp = (await chrome.tabs.sendMessage(msg.tabId, { kind: 'get-state' })) as ContentResponse
@@ -224,11 +227,11 @@ chrome.runtime.onMessage.addListener((msg: BackgroundRequest, _sender, sendRespo
           return
         }
         case 'test-endpoint': {
-          sendResponse(await testEndpoint(msg.endpoint))
+          sendResponse(await testEndpoint(msg.endpoint, msg.locale ?? 'de'))
           return
         }
         default:
-          sendResponse({ ok: false, error: 'Unbekannte Anfrage' })
+          sendResponse({ ok: false, error: t('de', 'bgUnknownRequest') })
       }
     } catch (e) {
       sendResponse({ ok: false, error: String(e) })
@@ -237,9 +240,9 @@ chrome.runtime.onMessage.addListener((msg: BackgroundRequest, _sender, sendRespo
   return true // async
 })
 
-async function testEndpoint(endpoint: Endpoint): Promise<{ ok: boolean; error?: string; detail?: string }> {
+async function testEndpoint(endpoint: Endpoint, locale: Locale): Promise<{ ok: boolean; error?: string; detail?: string }> {
   const format = detectFormat(endpoint)
-  const sys = systemInstruction('Antworte nur mit: OK', 'Test', 'test')
+  const sys = systemInstruction('Antworte nur mit: OK', 'Test', 'test', locale)
   try {
     if (format === 'openai') {
       const { url, headers, body } = openAiRequest(endpoint, {
@@ -250,7 +253,7 @@ async function testEndpoint(endpoint: Endpoint): Promise<{ ok: boolean; error?: 
         tools: [],
         maxTokens: 16,
       })
-      const json = (await fetchJson(url, headers, body)) as { model?: string }
+      const json = (await fetchJson(url, headers, body, locale)) as { model?: string }
       return { ok: true, detail: json.model }
     }
     const { url, headers, body } = anthropicRequest(endpoint, {
@@ -259,7 +262,7 @@ async function testEndpoint(endpoint: Endpoint): Promise<{ ok: boolean; error?: 
       tools: [],
       maxTokens: 16,
     })
-    const json = (await fetchJson(url, headers, body)) as { model?: string }
+    const json = (await fetchJson(url, headers, body, locale)) as { model?: string }
     return { ok: true, detail: json.model }
   } catch (e) {
     return { ok: false, error: String(e) }

@@ -4,6 +4,7 @@
   import { testEndpoint } from '../lib/messaging'
   import { copyText } from '../lib/clipboard'
   import { ENDPOINT_TEMPLATES } from '../lib/templates'
+  import { t, getLocale } from '../lib/i18n.svelte'
 
   let { endpoints, onChange }: { endpoints: Endpoint[]; onChange: (list: Endpoint[]) => void } = $props()
 
@@ -82,11 +83,11 @@
 
   function submit() {
     if (!title.trim()) {
-      formError = 'Bitte einen Titel angeben.'
+      formError = t('errTitle')
       return
     }
     if (!url.trim()) {
-      formError = 'Bitte die Endpunkt-URL angeben.'
+      formError = t('errUrl')
       return
     }
     // API-Key ist optional (z. B. lokale Server wie Ollama).
@@ -105,7 +106,7 @@
   }
 
   function remove(ep: Endpoint) {
-    if (!confirm('Endpunkt „' + ep.title + '“ wirklich löschen?')) return
+    if (!confirm(t('confirmDeleteEndpoint', { title: ep.title }))) return
     onChange(endpoints.filter((e) => e.id !== ep.id))
     if (editingId === ep.id) resetForm()
   }
@@ -113,8 +114,8 @@
   async function test(ep: Endpoint) {
     testingId = ep.id
     testOutcome = null
-    const r = await testEndpoint(ep)
-    testOutcome = r.ok ? { id: ep.id, ok: true, detail: r.detail || 'Verbindung OK' } : { id: ep.id, ok: false, detail: r.error || 'Fehler' }
+    const r = await testEndpoint(ep, getLocale())
+    testOutcome = r.ok ? { id: ep.id, ok: true, detail: r.detail || t('connectionOk') } : { id: ep.id, ok: false, detail: r.error || '?' }
     testingId = null
   }
 
@@ -130,9 +131,9 @@
   }
 
   function formatLabel(f: EndpointFormat): string {
-    if (f === 'anthropic') return 'Anthropic'
-    if (f === 'openai') return 'OpenAI'
-    return 'Auto'
+    if (f === 'anthropic') return t('formatAnthropicLabel')
+    if (f === 'openai') return t('formatOpenaiLabel')
+    return t('formatAutoLabel')
   }
 </script>
 
@@ -146,10 +147,10 @@
     class={card + ' p-4'}
   >
     <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? 'Endpunkt bearbeiten' : 'Neuer Endpunkt'}</h2>
+      <h2 class="text-sm font-semibold text-zinc-900">{editingId ? t('editEndpoint') : t('newEndpoint')}</h2>
       {#if editingId}
         <button type="button" onclick={resetForm} class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700">
-          Abbrechen
+          {t('cancel')}
         </button>
       {/if}
     </div>
@@ -159,7 +160,7 @@
         onchange={applyTemplate}
         class={input}
       >
-        <option value="">Vorlage wählen (füllt Felder vor) …</option>
+        <option value="">{t('templatePlaceholder')}</option>
         {#each ENDPOINT_TEMPLATES as t}
           <option value={t.id}>{t.label}</option>
         {/each}
@@ -167,13 +168,13 @@
       {#if appliedHint}
         <p class="text-[11px] text-zinc-500">{appliedHint}</p>
       {/if}
-      <input bind:value={title} type="text" placeholder="Titel, z. B. „OpenAI“" class={input} />
-      <input bind:value={url} type="text" placeholder="Endpunkt-URL, z. B. https://api.openai.com/v1/chat/completions" class={input} />
+      <input bind:value={title} type="text" placeholder={t('phTitle')} class={input} />
+      <input bind:value={url} type="text" placeholder={t('phUrl')} class={input} />
       <div class="relative">
         <input
           bind:value={apiKey}
           type={showKey ? 'text' : 'password'}
-          placeholder={editingId ? 'API-Key (leer lassen = beibehalten)' : 'API-Key (optional, z. B. bei Ollama leer)'}
+          placeholder={editingId ? t('phKeyKeep') : t('phKeyOptional')}
           class={input + ' pr-16'}
         />
         <button
@@ -185,21 +186,21 @@
         </button>
       </div>
       <div class="grid grid-cols-2 gap-2.5">
-        <input bind:value={model} type="text" placeholder="Modell (optional)" class={input} />
+        <input bind:value={model} type="text" placeholder={t('phModel')} class={input} />
         <select bind:value={format} class={input}>
-          <option value="auto">Format: Auto</option>
-          <option value="openai">OpenAI-kompatibel</option>
-          <option value="anthropic">Anthropic</option>
+          <option value="auto">{t('formatAutoOption')}</option>
+          <option value="openai">{t('formatOpenaiOption')}</option>
+          <option value="anthropic">{t('formatAnthropicOption')}</option>
         </select>
       </div>
       <p class="text-[10px] leading-relaxed text-zinc-400">
-        Auto erkennt Anthropic an der URL, sonst OpenAI-kompatibel (Chat Completions). Ohne Modell gilt ein Standardmodell.
+        {t('formatHint')}
       </p>
       {#if formError}
         <p class="text-xs font-medium text-rose-600">{formError}</p>
       {/if}
       <button type="submit" class={primary}>
-        {editingId ? 'Speichern' : 'Hinzufügen'}
+        {editingId ? t('save') : t('add')}
       </button>
     </div>
   </form>
@@ -207,11 +208,11 @@
   <!-- Liste -->
   <div class="flex flex-col gap-2.5">
     <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
-      Übersicht
-      <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{endpoints.length}</span>
+      {t('overview', { n: endpoints.length })}
+      
     </h2>
     {#if endpoints.length === 0}
-      <p class="text-xs text-zinc-400">Noch keine Endpunkte angelegt.</p>
+      <p class="text-xs text-zinc-400">{t('noEndpoints')}</p>
     {/if}
     {#each endpoints as ep}
       <div class="flex items-start gap-3 {card} p-3.5">
@@ -231,21 +232,21 @@
           <p class="mt-0.5 truncate text-[11px] text-zinc-500">{ep.url}</p>
           <p class="text-[11px] text-zinc-400">Modell: {ep.model || 'Standard'}</p>
           <p class="truncate font-mono text-[10px] text-zinc-400">
-            {ep.apiKey ? 'Key: ' + ep.apiKey.slice(0, 6) + '••••••••' : 'ohne Key'}
+            {ep.apiKey ? t('keyMasked', { prefix: ep.apiKey.slice(0, 6) }) : t('noKey')}
           </p>
         </div>
         <div class="flex shrink-0 flex-col items-end gap-1.5">
           <div class="flex gap-1">
-            <button type="button" onclick={() => startEdit(ep)} class={ghost}>Bearbeiten</button>
+            <button type="button" onclick={() => startEdit(ep)} class={ghost}>{t('edit')}</button>
             <button type="button" onclick={() => copy(ep)} class={ghost}>
-              {copiedId === ep.id ? 'Kopiert ✓' : 'Kopieren'}
+              {copiedId === ep.id ? t('copied') : t('copy')}
             </button>
             <button
               type="button"
               onclick={() => remove(ep)}
               class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
             >
-              Löschen
+              {t('delete')}
             </button>
           </div>
           <button
@@ -254,7 +255,7 @@
             disabled={testingId === ep.id}
             class={ghost + ' disabled:opacity-50'}
           >
-            {testingId === ep.id ? 'Testet …' : 'Verbindung testen'}
+            {testingId === ep.id ? t('testing') : t('testConnection')}
           </button>
           {#if testOutcome && testOutcome.id === ep.id}
             <p

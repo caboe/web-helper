@@ -1,4 +1,5 @@
 // Gemeinsame Typen für Panel, Background und Content-Script.
+import type { Locale } from './i18n'
 
 export type EndpointFormat = 'auto' | 'openai' | 'anthropic'
 
@@ -21,6 +22,8 @@ export interface Settings {
   endpointId?: string
   promptId?: string
   mode?: 'selection' | 'page'
+  /** Überschriebene Oberflächensprache; undefined = Browser-Erkennung. */
+  locale?: Locale
 }
 
 /** Von der Seite extrahierter Zustand, den das Panel anzeigt. */
@@ -52,6 +55,8 @@ export interface LlmRunRequest {
   pageUrl: string
   pageTitle: string
   tabId: number
+  /** Oberflächensprache (für lokalisierte System-Prompt-Basis und Fehlermeldungen). */
+  locale: Locale
 }
 
 export interface LlmRunResult {
@@ -73,7 +78,7 @@ export type PortUpdate =
 export type ContentRequest =
   | { kind: 'ping' }
   | { kind: 'get-state' }
-  | { kind: 'tool'; id: string; name: DomToolName; args: Record<string, unknown> }
+  | { kind: 'tool'; id: string; name: DomToolName; args: Record<string, unknown>; locale: Locale }
   | { kind: 'insert-text'; text: string; mode: 'replace' | 'insert' }
 
 export type ContentResponse =
@@ -85,7 +90,7 @@ export type ContentResponse =
 // ---------- Background-Messages (Panel -> Background) ----------
 
 export type BackgroundRequest =
-  | { kind: 'page-state'; tabId: number }
-  | { kind: 'ensure-content'; tabId: number }
-  | { kind: 'insert-text'; tabId: number; text: string; mode: 'replace' | 'insert' }
-  | { kind: 'test-endpoint'; endpoint: Endpoint }
+  | { kind: 'page-state'; tabId: number; locale: Locale }
+  | { kind: 'ensure-content'; tabId: number; locale: Locale }
+  | { kind: 'insert-text'; tabId: number; text: string; mode: 'replace' | 'insert'; locale: Locale }
+  | { kind: 'test-endpoint'; endpoint: Endpoint; locale: Locale }

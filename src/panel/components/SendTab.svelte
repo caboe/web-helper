@@ -4,6 +4,7 @@
   import { fetchPageState, getActiveTabId, insertTextIntoPage } from '../lib/messaging'
   import { copyText } from '../lib/clipboard'
   import { loadSettings, saveSettings } from '../lib/storage'
+  import { t, getLocale } from '../lib/i18n.svelte'
 
   let { endpoints, prompts }: { endpoints: Endpoint[]; prompts: SystemPrompt[] } = $props()
 
@@ -101,7 +102,7 @@
       return
     }
     if (!pageState || !currentTabId) {
-      errorMsg = 'Kein Seiteninhalt verfügbar. Bitte die Seite neu laden und erneut versuchen.'
+      errorMsg = t('errNoPage')
       status = 'error'
       return
     }
@@ -112,15 +113,15 @@
     if (mode === 'selection') {
       if (pageState.hasSelection) {
         selection = pageState.selection
-        note = 'Auswahl gesendet – ganze Seite als Kontext beigefügt.'
+        note = t('noteSelectionWithContext')
       } else {
-        note = 'Keine Markierung gefunden – stattdessen wurde die ganze Seite gesendet.'
+        note = t('noteNoSelectionFallback')
       }
     } else {
       note = ''
     }
     if (!userContent.trim()) {
-      errorMsg = 'Kein Seiteninhalt extrahiert.'
+      errorMsg = t('errNoContent')
       status = 'error'
       return
     }
@@ -158,6 +159,7 @@
       pageUrl: pageState.url,
       pageTitle: pageState.title,
       tabId: currentTabId,
+      locale: getLocale(),
     }
     port.postMessage(req)
   }
@@ -166,7 +168,7 @@
     disconnect()
     if (status === 'running') {
       status = 'idle'
-      note = 'Lauf abgebrochen.'
+      note = t('noteCancelled')
     }
   }
 
@@ -182,10 +184,10 @@
     if (!resultText || !currentTabId) return
     const ok = await insertTextIntoPage(currentTabId, resultText, 'replace')
     if (ok) {
-      note = 'Antwort wurde an der Markierung in die Seite eingefügt.'
+      note = t('noteInserted')
       errorMsg = ''
     } else {
-      errorMsg = 'Einfügen fehlgeschlagen – bitte auf der Seite Text markieren und erneut versuchen.'
+      errorMsg = t('errInsertFailed')
       status = 'error'
     }
   }
@@ -200,14 +202,13 @@
   <!-- Warnung: keine Endpunkte -->
   {#if endpoints.length === 0}
     <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-xs leading-relaxed text-amber-800">
-      Noch kein LLM-Endpunkt angelegt. Wechsle zu <strong class="font-semibold">Settings → Endpunkte</strong> und füge
-      einen hinzu (z. B. OpenAI, OpenRouter, Ollama oder Anthropic).
+      {t('noEndpointWarning')}
     </div>
   {/if}
 
   <!-- Modus-Auswahl -->
   <div>
-    <span class={label}>Inhalt senden</span>
+    <span class={label}>{t('sendContentLabel')}</span>
     <div class="flex rounded-full bg-zinc-200/60 p-1">
       <button
         type="button"
@@ -218,7 +219,7 @@
         class:text-zinc-500={mode !== 'selection'}
         class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
-        Auswahl
+        {t('modeSelection')}
       </button>
       <button
         type="button"
@@ -229,12 +230,12 @@
         class:text-zinc-500={mode !== 'page'}
         class="flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition"
       >
-        Ganze Seite
+        {t('modePage')}
       </button>
     </div>
     {#if mode === 'selection' && pageState && !pageState.hasSelection}
       <p class="mt-1.5 text-[11px] text-zinc-400">
-        Aktuell nichts markiert – beim Senden wird die ganze Seite verwendet.
+        {t('selectionEmptyHint')}
       </p>
     {/if}
   </div>
@@ -244,7 +245,7 @@
     <div class="rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700">
       {pageError}
       {#if currentTabId}
-        <button type="button" onclick={refresh} class="ml-2 font-semibold underline">Erneut versuchen</button>
+        <button type="button" onclick={refresh} class="ml-2 font-semibold underline">{t('retry')}</button>
       {/if}
     </div>
   {:else if pageState}
@@ -260,12 +261,12 @@
             <span class="text-[10px] text-zinc-400">{pageFor.length.toLocaleString('de-DE')} Zeichen</span>
           {/if}
           <button type="button" onclick={refresh} disabled={refreshing} class={ghost + ' disabled:opacity-50'}>
-            {refreshing ? '…' : 'Aktualisieren'}
+            {refreshing ? '…' : t('refresh')}
           </button>
         </div>
       </div>
       <div class="max-h-28 overflow-y-auto whitespace-pre-wrap break-words rounded-xl bg-zinc-50 p-2.5 text-[11px] leading-relaxed text-zinc-600">
-        {preview || '– keine Inhalte extrahiert –'}
+        {preview || t('noContentPreview')}
       </div>
     </div>
   {/if}
@@ -273,18 +274,18 @@
   <!-- Endpunkt + Prompt -->
   <div class="flex flex-col gap-3">
     <label class="block">
-      <span class={label}>LLM-Endpunkt</span>
+      <span class={label}>{t('endpointLabel')}</span>
       <select bind:value={endpointId} class={input}>
-        <option value="">– Endpunkt wählen –</option>
+        <option value="">{t('selectEndpoint')}</option>
         {#each endpoints as e}
           <option value={e.id}>{endpointLabel(e)}</option>
         {/each}
       </select>
     </label>
     <label class="block">
-      <span class={label}>Systemprompt</span>
+      <span class={label}>{t('promptLabel')}</span>
       <select bind:value={promptId} class={input}>
-        <option value="">– ohne Systemprompt –</option>
+        <option value="">{t('selectPrompt')}</option>
         {#each prompts as p}
           <option value={p.id}>{p.title}</option>
         {/each}
@@ -300,7 +301,7 @@
       disabled={running}
       class="{primary} flex-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
     >
-      {running ? 'Verarbeitet …' : 'An LLM senden'}
+      {running ? t('processing') : t('sendButton')}
     </button>
     {#if running}
       <button
@@ -308,7 +309,7 @@
         onclick={cancel}
         class="rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-600 transition hover:bg-zinc-50"
       >
-        Abbrechen
+        {t('cancel')}
       </button>
     {/if}
   </div>
@@ -318,7 +319,7 @@
     <div class={card + ' p-3'}>
       <div class="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
         <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
-        Tool-Aufrufe auf der Seite ({toolLog.length})
+        {t('toolLogTitle', { n: toolLog.length })}
       </div>
       <ul class="flex flex-col gap-1.5">
         {#each toolLog as t}
@@ -336,7 +337,7 @@
   {#if status === 'running'}
     <div class="flex items-center gap-2.5 rounded-2xl bg-white p-3 text-xs text-zinc-500 shadow-sm">
       <span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></span>
-      Das Modell arbeitet … (Tool-Calling aktiv)
+      {t('working')}
     </div>
   {/if}
 
@@ -346,14 +347,14 @@
       <div class="mb-2 flex items-center justify-between">
         <span class="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Antwort
+          {t('answer')}
         </span>
         <div class="flex gap-1.5">
           <button type="button" onclick={copyResult} class={ghost}>
-            {copied ? 'Kopiert ✓' : 'Kopieren'}
+            {copied ? t('copied') : t('copy')}
           </button>
           <button type="button" onclick={insertResult} class={ghost}>
-            In Seite einfügen
+            {t('insertIntoPage')}
           </button>
         </div>
       </div>

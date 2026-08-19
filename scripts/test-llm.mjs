@@ -1,14 +1,18 @@
 // Smoke-Test für den LLM-Client (src/shared/llm.ts) ohne chrome.*-Abhängigkeiten.
 import { execSync } from 'node:child_process'
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const out = '/tmp/llm-test'
 rmSync(out, { recursive: true, force: true })
 mkdirSync(out, { recursive: true })
 execSync('npx tsc src/shared/llm.ts --outDir ' + out + ' --module esnext --moduleResolution bundler --target es2022 --strict --skipLibCheck --erasableSyntaxOnly', { stdio: 'pipe' })
+// Node-ESM braucht Dateiendungen: extensionless './i18n' → './i18n.js'
+const llmJs = readFileSync(out + '/llm.js', 'utf8').replaceAll("from './i18n'", "from './i18n.js'")
+writeFileSync(out + '/llm.js', llmJs)
 
 const m = await import('file://' + out + '/llm.js')
+const i18n = await import('file://' + out + '/i18n.js')
 const { detectFormat, openAiRequest, parseOpenAiResponse, anthropicRequest, parseAnthropicResponse, systemInstruction, buildUserContent, TOOL_DEFS, DEFAULT_MODEL, MAX_TOOL_ITERATIONS } = m
 
 let failures = 0
@@ -105,6 +109,21 @@ for (const t of TOOL_DEFS) {
   check('Schema: ' + t.name, t.parameters.type === 'object' && typeof t.parameters.properties === 'object', JSON.stringify(t.parameters).slice(0, 50))
 }
 check('MAX_TOOL_ITERATIONS = 10', MAX_TOOL_ITERATIONS === 10)
+
+console.log('i18n:')
+const deKeys = Object.keys(i18n.translations.de)
+for (const loc of ['de', 'en', 'fr', 'es', 'zh']) {
+  const missing = deKeys.filter((k) => !(k in i18n.translations[loc]))
+  check('Vollständigkeit ' + loc, missing.length === 0, 'fehlt: ' + missing.join(','))
+}
+check('detectLocale liefert unterstützte Sprache', i18n.LOCALES.some((l) => l.code === i18n.detectLocale()), i18n.detectLocale())
+check('t de: sendButton', i18n.t('de', 'sendButton') === 'An LLM senden')
+check('t en: sendButton', i18n.t('en', 'sendButton') === 'Send to LLM')
+check('t en: fr Antwort', i18n.t('fr', 'sendButton') === 'Envoyer au LLM')
+check('t es: sendButton', i18n.t('es', 'sendButton') === 'Enviar al LLM')
+check('t zh: sendButton', i18n.t('zh', 'sendButton') === '发送给 LLM')
+check('t mit Vars', i18n.t('en', 'toolLogTitle', { n: 3 }) === 'Tool calls on the page (3)')
+check('sysBase lokalisiert', i18n.t('en', 'sysBase').toLowerCase().includes('tool calling'))
 
 console.log('')
 if (failures > 0) { console.log('FEHLGESCHLAGEN:', failures); process.exit(1) }
