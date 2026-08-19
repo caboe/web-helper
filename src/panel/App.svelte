@@ -2,13 +2,13 @@
   import { onMount } from 'svelte'
   import SendTab from './components/SendTab.svelte'
   import EndpointsTab from './components/EndpointsTab.svelte'
-  import PromptsTab from './components/PromptsTab.svelte'
+  import SettingsTab from './components/SettingsTab.svelte'
   import { loadEndpoints, loadPrompts, saveEndpoints, savePrompts } from './lib/storage'
   import type { Endpoint, SystemPrompt } from '../shared/types'
 
-  type TabId = 'send' | 'endpoints' | 'prompts'
+  type TabId = 'action' | 'settings'
 
-  let activeTab: TabId = $state<TabId>('send')
+  let activeTab: TabId = $state<TabId>('action')
   let endpoints: Endpoint[] = $state([])
   let prompts: SystemPrompt[] = $state([])
 
@@ -29,9 +29,8 @@
   }
 
   const tabs: { id: TabId; label: string }[] = [
-    { id: 'send', label: 'Senden' },
-    { id: 'endpoints', label: 'Endpunkte' },
-    { id: 'prompts', label: 'Prompts' },
+    { id: 'action', label: 'Aktion' },
+    { id: 'settings', label: 'Settings' },
   ]
 </script>
 
@@ -64,12 +63,10 @@
 
   <!-- Inhalt -->
   <main class="min-h-0 flex-1 overflow-y-auto">
-    {#if activeTab === 'send'}
+    {#if activeTab === 'action'}
       <SendTab {endpoints} {prompts} />
-    {:else if activeTab === 'endpoints'}
-      <EndpointsTab {endpoints} onChange={onEndpointsChange} />
     {:else}
-      <PromptsTab {prompts} onChange={onPromptsChange} />
+      <SettingsTab {endpoints} {prompts} onEndpointsChange={onEndpointsChange} onPromptsChange={onPromptsChange} />
     {/if}
   </main>
 

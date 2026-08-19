@@ -200,7 +200,7 @@
   <!-- Warnung: keine Endpunkte -->
   {#if endpoints.length === 0}
     <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-xs leading-relaxed text-amber-800">
-      Noch kein LLM-Endpunkt angelegt. Wechsle zum Tab <strong class="font-semibold">Endpunkte</strong> und füge
+      Noch kein LLM-Endpunkt angelegt. Wechsle zu <strong class="font-semibold">Settings → Endpunkte</strong> und füge
       einen hinzu (z. B. OpenAI, OpenRouter, Ollama oder Anthropic).
     </div>
   {/if}
