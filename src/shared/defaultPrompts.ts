@@ -11,6 +11,14 @@ export interface PromptSeed {
 export const DEFAULT_PROMPTS: Record<Locale, PromptSeed[]> = {
   de: [
     {
+      title: 'Zusammenfassung',
+      prompt: 'Fasse den markierten Text oder den Seiteninhalt präzise und strukturiert zusammen: kurze Einleitung, dann die wichtigsten Punkte als Bullet-Points. Lies bei Bedarf Details mit read_content nach. Antworte in der Sprache der Oberfläche.',
+    },
+    {
+      title: 'FactCheck',
+      prompt: 'Prüfe die Behauptungen im markierten Text (oder Seiteninhalt) auf Fakten und Plausibilität. Bewerte jede Kernaussage als belegt, teilweise belegt oder unbelegt und begründe jeweils kurz. Lies bei Bedarf die Seite mit read_content nach. Antworte in der Sprache der Oberfläche.',
+    },
+    {
       title: 'Adresse in Formularen ausfüllen',
       prompt: 'Fülle die Adressfelder des Formulars auf der Seite mit den Adressdaten aus dem Kontext (markierter Ausschnitt oder Seiteninhalt). Nutze dafür fill_element mit passenden CSS-Selektoren für Name, Straße, PLZ, Ort und Land. Prüfe anschließend mit read_content, ob alle Pflichtfelder korrekt gefüllt sind, und ergänze fehlende Angaben. Antworte kurz in der Sprache der Oberfläche.',
     },
@@ -48,6 +56,14 @@ export const DEFAULT_PROMPTS: Record<Locale, PromptSeed[]> = {
     },
   ],
   en: [
+    {
+      title: 'Summary',
+      prompt: 'Summarize the marked text or the page content precisely and in a structured way: a short introduction, then the key points as bullet points. Use read_content to look up details when needed. Answer in the UI language.',
+    },
+    {
+      title: 'FactCheck',
+      prompt: 'Check the claims in the marked text (or page content) for facts and plausibility. Rate each key claim as supported, partially supported or unsupported, and briefly justify each rating. Use read_content to re-read the page when needed. Answer in the UI language.',
+    },
     {
       title: 'Fill address in forms',
       prompt: 'Fill in the address fields of the form on the page with the address data from the context (marked selection or page content). Use fill_element with suitable CSS selectors for name, street, postal code, city and country. Then check with read_content whether all required fields are filled correctly and add missing details. Answer briefly in the UI language.',
@@ -87,6 +103,14 @@ export const DEFAULT_PROMPTS: Record<Locale, PromptSeed[]> = {
   ],
   fr: [
     {
+      title: 'Résumé',
+      prompt: 'Résumez le texte sélectionné ou le contenu de la page de manière précise et structurée : une courte introduction, puis les points clés sous forme de puces. Utilisez read_content pour consulter les détails si nécessaire. Répondez dans la langue de l’interface.',
+    },
+    {
+      title: 'Vérification des faits',
+      prompt: 'Vérifiez les affirmations du texte sélectionné (ou du contenu de la page) sur le plan factuel et de la plausibilité. Évaluez chaque affirmation clé comme étayée, partiellement étayée ou non étayée, et justifiez brièvement chaque évaluation. Relisez la page avec read_content si nécessaire. Répondez dans la langue de l’interface.',
+    },
+    {
       title: 'Remplir l’adresse dans les formulaires',
       prompt: 'Remplissez les champs d’adresse du formulaire sur la page avec les données d’adresse du contexte (sélection marquée ou contenu de la page). Utilisez fill_element avec des sélecteurs CSS adaptés pour le nom, la rue, le code postal, la ville et le pays. Vérifiez ensuite avec read_content que tous les champs obligatoires sont correctement remplis et complétez les informations manquantes. Répondez brièvement dans la langue de l’interface.',
     },
@@ -125,6 +149,14 @@ export const DEFAULT_PROMPTS: Record<Locale, PromptSeed[]> = {
   ],
   es: [
     {
+      title: 'Resumen',
+      prompt: 'Resume el texto seleccionado o el contenido de la página de forma precisa y estructurada: una breve introducción y luego los puntos clave como viñetas. Usa read_content para consultar detalles si es necesario. Responde en el idioma de la interfaz.',
+    },
+    {
+      title: 'Verificación de hechos',
+      prompt: 'Comprueba las afirmaciones del texto seleccionado (o del contenido de la página) en cuanto a hechos y plausibilidad. Evalúa cada afirmación clave como fundamentada, parcialmente fundamentada o sin fundamentar, y justifica brevemente cada evaluación. Vuelve a leer la página con read_content si es necesario. Responde en el idioma de la interfaz.',
+    },
+    {
       title: 'Rellenar dirección en formularios',
       prompt: 'Rellena los campos de dirección del formulario de la página con los datos de dirección del contexto (selección marcada o contenido de la página). Usa fill_element con selectores CSS adecuados para nombre, calle, código postal, ciudad y país. A continuación, comprueba con read_content si todos los campos obligatorios están rellenados correctamente y completa los datos que falten. Responde brevemente en el idioma de la interfaz.',
     },
@@ -162,6 +194,14 @@ export const DEFAULT_PROMPTS: Record<Locale, PromptSeed[]> = {
     },
   ],
   zh: [
+    {
+      title: '摘要',
+      prompt: '精确、结构化地总结所选文本或页面内容：先简短介绍，再以要点形式列出关键内容。需要时用 read_content 查询细节。请用界面语言回答。',
+    },
+    {
+      title: '事实核查',
+      prompt: '检查所选文本（或页面内容）中的陈述是否属实且合理。将每条关键陈述评估为有依据、部分有依据或无依据，并简要说明理由。必要时用 read_content 重新阅读页面。请用界面语言回答。',
+    },
     {
       title: '在表单中填写地址',
       prompt: '使用上下文（标记选区或页面内容）中的地址数据填写页面上表单的地址字段。使用 fill_element 并配合合适的 CSS 选择器填写姓名、街道、邮编、城市和国家。然后用 read_content 检查所有必填字段是否填写正确，并补充缺失的信息。请用界面语言简要回答。',

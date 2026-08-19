@@ -146,7 +146,7 @@ check('sysBase lokalisiert', i18n.t('en', 'sysBase').toLowerCase().includes('too
 console.log('Standard-Prompts:')
 for (const loc of ['de', 'en', 'fr', 'es', 'zh']) {
   const seeds = dp.getDefaultPrompts(loc)
-  check(loc + ': 9 Prompts', seeds.length === 9, seeds.length)
+  check(loc + ': 11 Aktionen', seeds.length === 11, seeds.length)
   check(loc + ': Titel eindeutig', new Set(seeds.map((s) => s.title)).size === seeds.length)
   check(loc + ': Inhalte nicht leer', seeds.every((s) => s.title.trim().length > 0 && s.prompt.trim().length > 20))
   check(loc + ': Tools erwähnt', seeds.every((s) => s.prompt.includes('fill_element') || s.prompt.includes('read_content') || s.prompt.includes('set_text')))
