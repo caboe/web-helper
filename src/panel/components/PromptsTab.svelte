@@ -125,26 +125,49 @@
       <p class="text-xs text-zinc-400">{t('noPrompts')}</p>
     {/if}
     {#each prompts as p}
-      <div class="flex items-start justify-between gap-3 {card} p-3.5">
-        <div class="min-w-0">
-          <span class="block truncate text-sm font-medium text-zinc-900">{p.title}</span>
-          <p class="mt-1 max-h-16 overflow-hidden whitespace-pre-wrap break-words text-[11px] leading-relaxed text-zinc-500">
-            {p.prompt}
-          </p>
+      <div class="{card} p-3.5">
+        <!-- Titel + Icon-Aktionen auf einer Zeile -->
+        <div class="flex items-center justify-between gap-2">
+          <span class="truncate text-sm font-medium text-zinc-900" title={p.title}>{p.title}</span>
+          <div class="flex shrink-0 items-center gap-0.5">
+            <button
+              type="button"
+              onclick={() => startEdit(p)}
+              title={t('edit')}
+              aria-label={t('edit')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+            <button
+              type="button"
+              onclick={() => copy(p)}
+              title={copiedId === p.id ? t('copied') : t('copy')}
+              aria-label={t('copy')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+              class:text-emerald-500={copiedId === p.id}
+            >
+              {#if copiedId === p.id}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              {:else}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              {/if}
+            </button>
+            <button
+              type="button"
+              onclick={() => remove(p)}
+              title={t('delete')}
+              aria-label={t('delete')}
+              class="grid h-7 w-7 place-items-center rounded-lg text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="flex shrink-0 gap-1">
-          <button type="button" onclick={() => startEdit(p)} class={ghost}>{t('edit')}</button>
-          <button type="button" onclick={() => copy(p)} class={ghost}>
-            {copiedId === p.id ? t('copied') : t('copy')}
-          </button>
-          <button
-            type="button"
-            onclick={() => remove(p)}
-            class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
-          >
-            {t('delete')}
-          </button>
-        </div>
+        <!-- Prompt-Anfang in voller Breite -->
+        <p class="mt-2 line-clamp-3 whitespace-pre-wrap break-words text-[11px] leading-relaxed text-zinc-500">
+          {p.prompt}
+        </p>
       </div>
     {/each}
   </div>
