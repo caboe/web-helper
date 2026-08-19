@@ -1,7 +1,7 @@
-# Google Chrome Web Store – Listing for "Web Helper AI" (English)
+# Google Chrome Web Store – Listing for "AI Page Actions" (English)
 
 ## Name (max. 75 chars)
-Web Helper AI
+AI Page Actions
 
 ## Summary / Short Description (max. 132 characters)
 
@@ -13,7 +13,7 @@ Send page content to your own LLM endpoints – system prompts, tool calling and
 
 ## Detailed Description (English)
 
-**Web Helper AI** turns your browser's side panel into a personal AI assistant for the current website:
+**AI Page Actions** turns your browser's side panel into a personal AI assistant for the current website:
 send content – a marked selection or the whole page – to your own LLM endpoint and let the model work
 directly on the page. The interface is available in **5 languages** (English, German, French, Spanish,
 Chinese), detected automatically from your browser settings and overridable in the settings.

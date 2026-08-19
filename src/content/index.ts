@@ -396,5 +396,5 @@ if (!window[INJECTION_KEY]) {
     return true // async
   })
 
-  console.log('[Web Helper AI] Content-Script aktiv')
+  console.log('[AI Page Actions] Content-Script aktiv')
 }

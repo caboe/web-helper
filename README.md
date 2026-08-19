@@ -1,4 +1,4 @@
-# Web Helper AI — Chrome-Erweiterung (MV3)
+# AI Page Actions — Chrome-Erweiterung (MV3)
 
 Svelte 5 + Tailwind CSS 4 + TypeScript (Vite 8).
 
@@ -49,7 +49,7 @@ npm run dev            # Build mit --watch
 npm run check          # svelte-check
 npm run typecheck      # tsc --noEmit
 npm run test:llm       # Smoke-Tests für den LLM-Client
-npm run package        # dist/ → web-helper-ai.zip
+npm run package        # dist/ → ai-page-actions.zip
 ```
 
 In Chrome laden: **chrome://extensions** → „Entwicklermodus“ aktivieren →

@@ -1,9 +1,9 @@
-# Web Helper AI – Chrome Web Store Listing (Summary)
+# AI Page Actions – Chrome Web Store Listing (Summary)
 
 ## Submission fields
 | Field | Value |
 |---|---|
-| Name | Web Helper AI |
+| Name | AI Page Actions |
 | Category | Productivity |
 | Languages | UI in 5 languages (EN/DE/FR/ES/ZH) · Listing in English |
 | Type | Chrome Extension (MV3) |

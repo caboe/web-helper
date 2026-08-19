@@ -1,5 +1,5 @@
 {
-  "name": "web-helper-ai",
+  "name": "ai-page-actions",
   "private": true,
   "version": "0.1.0",
   "description": "Chrome-Extension (MV3): LLM-Endpunkte & Systemprompts verwalten, Seiteninhalte senden, Tool-Calling auf der Seite.",

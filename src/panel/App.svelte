@@ -54,7 +54,7 @@
       height="24"
       class="h-6 w-6 rounded-lg shadow-[0_2px_8px_rgba(99,102,241,0.35)]"
     />
-    <h1 class="text-sm font-semibold tracking-tight">Web Helper AI</h1>
+    <h1 class="text-sm font-semibold tracking-tight">AI Page Actions</h1>
     <div class="ml-auto flex items-center gap-0.5">
       {#each tabs as t}
         <button

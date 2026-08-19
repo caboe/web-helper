@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Web Helper AI",
+  "name": "AI Page Actions",
   "version": "0.1.0",
   "description": "Seiteninhalte an eigene LLM-Endpunkte senden – mit Systemprompts und Tool-Calling direkt auf der Seite.",
   "minimum_chrome_version": "91",
@@ -21,7 +21,7 @@
     "default_path": "panel.html"
   },
   "action": {
-    "default_title": "Web Helper AI",
+    "default_title": "AI Page Actions",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
