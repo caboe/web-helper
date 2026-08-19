@@ -5,7 +5,7 @@
   import SettingsTab from './components/SettingsTab.svelte'
   import { t, initI18n, getLocale } from './lib/i18n.svelte'
   import { getDefaultPrompts } from '../shared/defaultPrompts'
-  import { newId, loadSettings } from './lib/storage'
+  import { newId, loadSettings, saveSettings } from './lib/storage'
   import { loadEndpoints, loadPrompts, saveEndpoints, savePrompts } from './lib/storage'
   import type { Endpoint, SystemPrompt } from '../shared/types'
 
