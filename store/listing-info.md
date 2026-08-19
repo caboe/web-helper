@@ -1,37 +1,37 @@
-# Web Helper AI – Chrome Web Store Listing (Zusammenfassung)
+# Web Helper AI – Chrome Web Store Listing (Summary)
 
-## Einzureichende Angaben
-| Feld | Wert |
+## Submission fields
+| Field | Value |
 |---|---|
 | Name | Web Helper AI |
-| Kategorie | Productivity / Produktivität |
-| Sprachen | Deutsch (UI) · Beschreibung DE + EN |
-| Typ | Chrome-Erweiterung (MV3) |
-| Kurzbeschreibung (DE, ≤132 Z.) | Seiteninhalte mit eigenen LLM-Endpunkten verarbeiten – mit Systemprompts und Tool-Calling direkt auf der Seite. |
+| Category | Productivity |
+| Languages | UI in 5 languages (EN/DE/FR/ES/ZH) · Listing in English |
+| Type | Chrome Extension (MV3) |
+| Summary (EN, ≤132 chars) | Send page content to your own LLM endpoints – system prompts, tool calling and 5 UI languages. |
 
-## Dateien
-- **Beschreibung**: `store/description.md` (Kurz- + Langfassung DE/EN, Datenschutz, Hinweise)
-- **Screenshots** (1280×800, empfohlenes Format):
-  | Datei | Inhalt |
+## Files
+- **Description**: `store/description.md` (English – short + detailed, privacy, notes)
+- **Screenshots** (1280×800, recommended format):
+  | File | Content |
   |---|---|
-  | `01-uebersicht.png` | Side Panel mit markiertem Text, Seiten-Vorschau, Endpunkt-/Prompt-Auswahl |
-  | `02-endpunkte.png` | Endpunkt-Verwaltung: Provider-Vorlage „OpenRouter“ + Übersicht |
-  | `03-prompts.png` | Systemprompt-Editor + Prompt-Übersicht |
-  | `04-tool-calling.png` | Tool-Calling in Aktion: Formular wird direkt auf der Seite ausgefüllt |
-  | `05-antwort.png` | LLM-Antwort mit „Kopieren“ / „In Seite einfügen“ |
-- **Promo-Tile**: `promo-tile.png` (440×280) – optionales kleines Promo-Bild
+  | `01-action.png` | Action tab: selected text, live preview with selection + full page as context, endpoint/prompt pickers |
+  | `02-tool-calling.png` | Tool calling in action: form filled on the page, tool log, answer with Copy / Insert into page |
+  | `03-settings-endpoints.png` | Settings → Endpoints: provider template "OpenRouter" + endpoint overview |
+  | `04-settings-prompts.png` | Settings → Prompts: system prompt editor + overview |
+  | `05-settings-language.png` | Settings → Language: 5 languages, auto-detection + override |
+- **Promo tile**: `promo-tile.png` (440×280)
 
-## Empfohlene Screenshot-Reihenfolge (max. 5)
-1. `01-uebersicht.png` – erster Eindruck: Markierung + Senden
-2. `04-tool-calling.png` – Alleinstellungsmerkmal (Tool-Calling auf der Seite)
-3. `02-endpunkte.png` – Endpunkt-Verwaltung mit Vorlagen
-4. `03-prompts.png` – Systemprompts
-5. `05-antwort.png` – Ergebnis & Einfügen
+## Recommended screenshot order (max. 5)
+1. `01-action.png` – first impression: selection + send
+2. `02-tool-calling.png` – unique selling point (tool calling on the page)
+3. `03-settings-endpoints.png` – endpoint management with templates
+4. `04-settings-prompts.png` – system prompts
+5. `05-settings-language.png` – multilingual UI
 
-## Checkliste für den Store
-- [ ] Beschreibung aus `description.md` übernehmen (Kurz- + Langtext)
-- [ ] Screenshots hochladen (1–5, 1280×800)
-- [ ] Promo-Tile `promo-tile.png` (440×280) hochladen
-- [ ] Kategorie „Produktivität“ wählen
-- [ ] Privatsphäre: keine Datenerhebung, keine externen Dienste angeben
-- [ ] „Single Purpose“-Erklärung: KI-Assistent für Webseiteninhalte mit eigenen LLM-Endpunkten
+## Store checklist
+- [ ] Copy description from `store/description.md` (summary + detailed)
+- [ ] Upload screenshots (1–5, 1280×800)
+- [ ] Upload promo tile `promo-tile.png` (440×280)
+- [ ] Choose category "Productivity"
+- [ ] Privacy: no data collection, no external services
+- [ ] Single-purpose statement: AI assistant for webpage content with your own LLM endpoints
