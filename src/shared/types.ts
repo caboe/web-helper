@@ -24,6 +24,8 @@ export interface Settings {
   mode?: 'selection' | 'page'
   /** Überschriebene Oberflächensprache; undefined = Browser-Erkennung. */
   locale?: Locale
+  /** Wurden die Standard-Prompts bereits einmal angelegt? (verhindert erneutes Seeding nach Löschen) */
+  promptsSeeded?: boolean
 }
 
 /** Von der Seite extrahierter Zustand, den das Panel anzeigt. */

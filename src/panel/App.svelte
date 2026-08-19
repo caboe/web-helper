@@ -3,7 +3,9 @@
   import SendTab from './components/SendTab.svelte'
   import EndpointsTab from './components/EndpointsTab.svelte'
   import SettingsTab from './components/SettingsTab.svelte'
-  import { t, initI18n } from './lib/i18n.svelte'
+  import { t, initI18n, getLocale } from './lib/i18n.svelte'
+  import { getDefaultPrompts } from '../shared/defaultPrompts'
+  import { newId, loadSettings } from './lib/storage'
   import { loadEndpoints, loadPrompts, saveEndpoints, savePrompts } from './lib/storage'
   import type { Endpoint, SystemPrompt } from '../shared/types'
 
@@ -17,6 +19,13 @@
     const [e, p] = await Promise.all([loadEndpoints(), loadPrompts(), initI18n()])
     endpoints = e
     prompts = p
+    // Beim ersten Start (leere Liste + noch nie geseedet): 9 Standard-Prompts anlegen.
+    const settings = await loadSettings()
+    if (prompts.length === 0 && !settings.promptsSeeded) {
+      prompts = getDefaultPrompts(getLocale()).map((s) => ({ id: newId(), title: s.title, prompt: s.prompt }))
+      savePrompts(prompts)
+      saveSettings({ promptsSeeded: true })
+    }
   })
 
   function onEndpointsChange(list: Endpoint[]) {

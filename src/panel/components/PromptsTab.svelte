@@ -2,7 +2,8 @@
   import type { SystemPrompt } from '../../shared/types'
   import { newId } from '../lib/storage'
   import { copyText } from '../lib/clipboard'
-  import { t } from '../lib/i18n.svelte'
+  import { t, getLocale } from '../lib/i18n.svelte'
+  import { getDefaultPrompts } from '../../shared/defaultPrompts'
 
   let { prompts, onChange }: { prompts: SystemPrompt[]; onChange: (list: SystemPrompt[]) => void } = $props()
 
@@ -58,6 +59,12 @@
     if (editingId === p.id) resetForm()
   }
 
+  function resetDefaults() {
+    if (!confirm(t('confirmResetPrompts'))) return
+    const seeds = getDefaultPrompts(getLocale())
+    onChange(seeds.map((s) => ({ id: newId(), title: s.title, prompt: s.prompt })))
+  }
+
   async function copy(p: SystemPrompt) {
     const ok = await copyText(p.prompt)
     if (ok) {
@@ -105,10 +112,15 @@
 
   <!-- Liste -->
   <div class="flex flex-col gap-2.5">
-    <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
-      {t('overview', { n: prompts.length })}
-      <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{prompts.length}</span>
-    </h2>
+    <div class="flex items-center justify-between">
+      <h2 class="flex items-center gap-2 text-sm font-semibold text-zinc-700">
+        {t('overview', { n: prompts.length })}
+        <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{prompts.length}</span>
+      </h2>
+      <button type="button" onclick={resetDefaults} class="{ghost}">
+        {t('resetDefaults')}
+      </button>
+    </div>
     {#if prompts.length === 0}
       <p class="text-xs text-zinc-400">{t('noPrompts')}</p>
     {/if}

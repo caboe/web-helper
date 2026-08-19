@@ -6,13 +6,14 @@ import { join } from 'node:path'
 const out = '/tmp/llm-test'
 rmSync(out, { recursive: true, force: true })
 mkdirSync(out, { recursive: true })
-execSync('npx tsc src/shared/llm.ts --outDir ' + out + ' --module esnext --moduleResolution bundler --target es2022 --strict --skipLibCheck --erasableSyntaxOnly', { stdio: 'pipe' })
+execSync('npx tsc src/shared/llm.ts src/shared/defaultPrompts.ts --outDir ' + out + ' --module esnext --moduleResolution bundler --target es2022 --strict --skipLibCheck --erasableSyntaxOnly', { stdio: 'pipe' })
 // Node-ESM braucht Dateiendungen: extensionless './i18n' → './i18n.js'
 const llmJs = readFileSync(out + '/llm.js', 'utf8').replaceAll("from './i18n'", "from './i18n.js'")
 writeFileSync(out + '/llm.js', llmJs)
 
 const m = await import('file://' + out + '/llm.js')
 const i18n = await import('file://' + out + '/i18n.js')
+const dp = await import('file://' + out + '/defaultPrompts.js')
 const { detectFormat, openAiRequest, parseOpenAiResponse, anthropicRequest, parseAnthropicResponse, systemInstruction, buildUserContent, TOOL_DEFS, DEFAULT_MODEL, MAX_TOOL_ITERATIONS } = m
 
 let failures = 0
@@ -132,6 +133,15 @@ check('t es: sendButton', i18n.t('es', 'sendButton') === 'Enviar al LLM')
 check('t zh: sendButton', i18n.t('zh', 'sendButton') === '发送给 LLM')
 check('t mit Vars', i18n.t('en', 'toolLogTitle', { n: 3 }) === 'Tool calls on the page (3)')
 check('sysBase lokalisiert', i18n.t('en', 'sysBase').toLowerCase().includes('tool calling'))
+
+console.log('Standard-Prompts:')
+for (const loc of ['de', 'en', 'fr', 'es', 'zh']) {
+  const seeds = dp.getDefaultPrompts(loc)
+  check(loc + ': 9 Prompts', seeds.length === 9, seeds.length)
+  check(loc + ': Titel eindeutig', new Set(seeds.map((s) => s.title)).size === seeds.length)
+  check(loc + ': Inhalte nicht leer', seeds.every((s) => s.title.trim().length > 0 && s.prompt.trim().length > 20))
+  check(loc + ': Tools erwähnt', seeds.every((s) => s.prompt.includes('fill_element') || s.prompt.includes('read_content') || s.prompt.includes('set_text')))
+}
 
 console.log('')
 if (failures > 0) { console.log('FEHLGESCHLAGEN:', failures); process.exit(1) }
