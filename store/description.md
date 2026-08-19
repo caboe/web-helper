@@ -22,8 +22,8 @@ Chinese), detected automatically from your browser settings and overridable in t
 - **Manage LLM endpoints**: add any number of endpoints (OpenAI, Anthropic, OpenRouter, DeepSeek, Kimi,
   Qwen, Gemini, Mistral, Groq, local servers like Ollama …) with API key, model and format. Handy
   **provider templates** pre-fill every field – you only add your API key.
-- **Manage system prompts**: save reusable instructions (e.g. "Form Assistant", "Summarize", "Translate")
-  and pick one per request.
+- **Manage actions (system prompts)**: save reusable instructions (e.g. "Form Assistant", "Summarize", "Translate")
+  and pick one per request – shown as "Actions" in the UI.
 - **Send content**: select text on the page and send the selection – the **whole page is always included
   as context** so the model understands the full picture. Or send the whole page directly (markdown-like
   extraction). Switch with a toggle.
@@ -40,7 +40,7 @@ Chinese), detected automatically from your browser settings and overridable in t
 #### How it works
 1. Open the side panel via the toolbar icon (older Chrome versions automatically fall back to a popup).
 2. Add your LLM endpoint under Settings → Endpoints (templates help).
-3. Select text on any website and send it with your chosen system prompt.
+3. Select text on any website and send it with your chosen action (system prompt).
 4. Watch the tool calls live and insert the answer into the page when needed.
 
 #### Privacy & security

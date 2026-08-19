@@ -17,7 +17,7 @@
   | `01-action.png` | Action tab: selected text, live preview with selection + full page as context, endpoint/prompt pickers |
   | `02-tool-calling.png` | Tool calling in action: form filled on the page, tool log, answer with Copy / Insert into page |
   | `03-settings-endpoints.png` | Settings → Endpoints: provider template "OpenRouter" + endpoint overview |
-  | `04-settings-prompts.png` | Settings → Prompts: system prompt editor + overview |
+  | `04-settings-prompts.png` | Settings → Actions: action (system prompt) editor + overview |
   | `05-settings-language.png` | Settings → Language: 5 languages, auto-detection + override |
 - **Promo tile**: `promo-tile.png` (440×280)
 
